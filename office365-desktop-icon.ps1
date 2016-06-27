@@ -1,3 +1,13 @@
+<#
+Office365 - Desktop Icon
+
+ * make desktop shortcut icon
+ * save Tenant URL
+ * auto login User & Password
+ * secure string hash
+ * enumerate all tenant sites
+#>
+
 Write-Host "=== Make Office 365 PowerShell desktop icon  ==="
 
 # input

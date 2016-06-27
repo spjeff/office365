@@ -67,16 +67,6 @@ workflow GPOWorkflow {
 				$update = $true
             }
 			
-			if ($site.ShareByEmailEnabled) {
-				$site.ShareByEmailEnabled = $false
-				$update = $true
-			}
-			
-			if ($site.ShareByLinkEnabled) {
-				$site.ShareByLinkEnabled = $false
-				$update = $true
-			}
-			
 			if (!$site.DisableCompanyWideSharingLinks) {
 				$site.DisableCompanyWideSharingLinks = $true 
 				$update = $true

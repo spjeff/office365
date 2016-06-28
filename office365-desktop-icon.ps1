@@ -1,11 +1,25 @@
 <#
-Office365 - Desktop Icon
+.SYNOPSIS
+	SharePoint Central Admin - View active services across entire farm. No more select machine drop down dance!
+.DESCRIPTION
+	Create Desktop Icon to launch Office 365 with securely saved credentials
 
- * make desktop shortcut icon
- * save Tenant URL
- * auto login User & Password
- * secure string hash
- * enumerate all tenant sites
+	Comments and suggestions always welcome!  spjeff@spjeff.com or @spjeff
+.NOTES
+	File Name		: office365-desktop-icon.ps1
+	Author			: Jeff Jones - @spjeff
+	Version			: 0.05
+	Last Modified	: 06-28-2016
+.LINK
+	Source Code
+		http://www.github.com/spjeff/o365/office365-desktop-icon.ps1
+	
+	Download PowerShell Plugins
+		* SPO - SharePoint Online
+		https://www.microsoft.com/en-us/download/details.aspx?id=35588
+		
+		* PNP - Patterns and Practices
+		https://github.com/officedev/pnp-powershell
 #>
 
 Write-Host "=== Make Office 365 PowerShell desktop icon  ==="
@@ -19,7 +33,7 @@ $pw = Read-Host "Tenant - Password:" -AsSecureString
 $hash = $pw | ConvertFrom-SecureString
 
 # shortcut
-"`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell`nConnect-SPOService -URL $url -Credential `$c`nGet-SPOSite" | Out-File "$home\o365-icon.ps1"
+"`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP`nConnect-SPOService -URL $url -Credential `$c`nGet-SPOSite" | Out-File "$home\o365-icon.ps1"
 
 # create shortcut
 $folder = [Environment]::GetFolderPath("Desktop")

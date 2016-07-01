@@ -25,17 +25,17 @@
 Write-Host "=== Make Office 365 PowerShell desktop icon  ==="
 
 # input
-$url = Read-Host "Tenant - Admin URL:"
-$user = Read-Host "Tenant - Username:"
-$pw = Read-Host "Tenant - Password:" -AsSecureString
+$url = Read-Host "Tenant - Admin URL"
+$user = Read-Host "Tenant - Username"
+$pw = Read-Host "Tenant - Password" -AsSecureString
 
 # save to registry
 $hash = $pw | ConvertFrom-SecureString
 
-# shortcut
-"`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP`nConnect-SPOService -URL $url -Credential `$c`nGet-SPOSite" | Out-File "$home\o365-icon.ps1"
+# command
+"(Get-Host).UI.RawUI.BackgroundColor=""DarkBlue""`n(Get-Host).UI.RawUI.ForegroundColor=""White""`nClear-Host`n`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS -ErrorAction SilentlyContinue`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP -ErrorAction SilentlyContinue`nConnect-MSSPOService -URL $url -Credential `$c`n`$firstUrl = (Get-MSSPOSite)[0].Url`nConnect-PNPSPOnline -URL `$firstUrl -Credential `$c`nGet-MSSPOSite`n" | Out-File "$home\o365-icon.ps1"
 
-# create shortcut
+# create desktop shortcut
 $folder = [Environment]::GetFolderPath("Desktop")
 $TargetFile = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
 $ShortcutFile = "$folder\Office365.lnk"

@@ -8,8 +8,8 @@
 .NOTES
 	File Name		: office365-desktop-icon.ps1
 	Author			: Jeff Jones - @spjeff
-	Version			: 0.05
-	Last Modified	: 06-28-2016
+	Version			: 0.06
+	Last Modified	: 07-01-2016
 .LINK
 	Source Code
 		http://www.github.com/spjeff/o365/office365-desktop-icon.ps1

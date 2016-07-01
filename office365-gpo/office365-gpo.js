@@ -31,6 +31,7 @@ Office365 - Group Policy
 								'Duet Enterprise Reporting',
 								'Duet Enterprise Site Branding',
 								'Getting Started with Project Web App',
+								'Minimal Download Strategy',
 								'Project Functionality',
 								'Project Proposal Workflow',
 								'Project Web App Connectivity',

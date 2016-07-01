@@ -12,7 +12,7 @@ Office365 - Group Policy
 
 # Core
 workflow GPOWorkflow {
-	Param ($sites, $UserName, $Password)
+    param ($sites, $UserName, $Password)
 
 	Function VerifySite([string]$SiteUrl,[string]$UserName,[string]$Password) {
 		Function Get-SPOCredentials([string]$UserName,[string]$Password) {
@@ -54,19 +54,95 @@ workflow GPOWorkflow {
 				"ADDED"
 			}
 		}
+		Function Verify-Features([Microsoft.SharePoint.Client.ClientContext]$Context) {		
+			#list of Site features
+            $feat = $Context.Site.Features
+            $Context.Load($feat)
+			$Context.ExecuteQuery()
+			
+			#SPSite - Enable Workflow
+			$id = New-Object System.Guid "0af5989a-3aea-4519-8ab0-85d91abe39ff"
+			$found = $feat |? {$_.DefinitionId -eq $id}
+			if (!$found) {
+				$featSite.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
+			}
+            $Context.ExecuteQuery()
+
+            #SPWeb - Disable Minimal Download Strategy (MDS)
+            Loop-WebFeature $Context $Context.Web $false "87294c72-f260-42f3-a41b-981a2ffce37a"
+		}
+        Function Loop-WebFeature ($Context, $currWeb, $wantActive, $featureId) {
+            #current web
+            Ensure-WebFeature $Context $currWeb $wantActive $featureId
+
+            #get child subwebs
+            $webs = $currWeb.Webs
+            $Context.Load($webs)
+            $Context.ExecuteQuery()
+			
+			#loop child subwebs
+            foreach ($web in $webs) {
+                #child web
+                Ensure-WebFeature $Context $web $wantActive $featureId
+
+                #Recurse
+                $subWebs = $web.Webs
+                $Context.Load($subWebs)
+                $Context.ExecuteQuery()
+                $subWebs | ForEach-Object { Loop-WebFeature $Context $_ $wantActive $featureId }
+            }
+        }
+        Function Ensure-WebFeature ($Context, $web, $wantActive, $featureId) {
+            #list of Web features
+            if ($web.Url) {
+                Write-Host " - $($web.Url)"
+			    $feat = $web.Features
+			    $Context.Load($feat)
+			    $Context.ExecuteQuery()
+
+                #Disable/Enable feature
+                $id = New-Object System.Guid $featureId
+                $found = $feat |? {$_.DefinitionId -eq $id}
+                if ($wantActive) {
+                    if (!$found) {$feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)}
+                } else {
+			        if ($found) {$feat.Remove($id, $true)}
+                }
+                $Context.ExecuteQuery()
+            }
+        }
 		Function Verify-General([Microsoft.SharePoint.Client.ClientContext]$Context) {
 			#SPSite Collection
 			$update = $false
 			$site = $Context.Site
 			$Context.Load($site)
 			$Context.ExecuteQuery()
+			
+			#SPWeb Root
+			$rootWeb = $site.RootWeb
+			$Context.Load($rootWeb)
+			$Context.ExecuteQuery()
+			
+			# Access Request list
+			<#REM
+			$arList = $site.RootWeb.Lists.GetByTitle("Access Requests");
+			$Context.Load($arList)
+			$Context.ExecuteQuery()
+			if ($arList) {
+				$arList.Hidden = $false
+				$arList.Update()
+				$update = $true
+			}
+			#>
 
+			# Trim Audit Log
             if (!$site.TrimAuditLog) {
                 $site.TrimAuditLog = $true
 				$site.AuditLogTrimmingRetention = 180
 				$update = $true
             }
 			
+			# External Sharing
 			if (!$site.DisableCompanyWideSharingLinks) {
 				$site.DisableCompanyWideSharingLinks = $true 
 				$update = $true
@@ -109,6 +185,9 @@ workflow GPOWorkflow {
 
 			# SITE COLLECTION CONFIG
 			Verify-General -Context $context
+			
+			# FEATURES
+			Verify-Features -Context $context
 
 			$context.Dispose()
 		} Catch {
@@ -151,8 +230,11 @@ Function Main {
 	$sites = Get-MSSPOSite
 	$sites.Count
 	
+
 	#Serial loop
+    Write-Host "Serial loop"
     ForEach ($s in $sites) {
+        Write-Host "." -NoNewLine
 		#SPO
         #Storage quota
         if (!$s.StorageQuota) {
@@ -161,22 +243,27 @@ Function Main {
         }
 
         #Site collection admin
-        Set-MSSPOUser -site $s.Url -Loginname $UserName -IsSiteCollectionAdmin $true
+        $user = Get-MSSPOUser -Site $s.Url -Loginname $UserName
+        if (!$user.IsSiteAdmin) {
+            Set-MSSPOUser -Site $s.Url -Loginname $UserName -IsSiteCollectionAdmin $true | Out-Null
+        }
 
 		#PNP
         Connect-PNPSPOnline -Url $s.Url -Credentials $c
         $audit = Get-PNPSPOAuditing
         if ($audit.AuditFlags -ne 7099) {
-            Set-PNPSPOAuditing -RetentionTime 180 -TrimAuditLog -EditItems -CheckOutCheckInItems -MoveCopyItems -DeleteRestoreItems -EditContentTypesColumns -EditUsersPermissions
+            Set-PNPSPOAuditing -RetentionTime 180 -TrimAuditLog -EditItems -CheckOutCheckInItems -MoveCopyItems -DeleteRestoreItems -EditContentTypesColumns -EditUsersPermissions -ErrorAction SilentlyContinue
             Write-Output "set audit flags on $($s.Url)"
         }
     }
 
    	#Parallel loop
 	#CSOM
+    Write-Host "Parallel loop"
 	GPOWorkflow $sites $UserName $Password
 
 	#Duration
-	[Math]::Round(((Get-Date) - $start).TotalMinutes, 2)
+	$min = [Math]::Round(((Get-Date) - $start).TotalMinutes, 2)
+    Write-Host "Duration Min : $min"
 }
 Main

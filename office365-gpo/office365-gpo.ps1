@@ -7,7 +7,6 @@ Office365 - Group Policy
  * apply Site Collection quota 2GB
  * enable Site Collection auditing
  * enable Site Collection Custom Action JS (JQuery + "office365-gpo.js")
- * disable external sharing
 #>
 
 # Core
@@ -141,12 +140,6 @@ workflow GPOWorkflow {
 				$site.AuditLogTrimmingRetention = 180
 				$update = $true
             }
-			
-			# External Sharing
-			if (!$site.DisableCompanyWideSharingLinks) {
-				$site.DisableCompanyWideSharingLinks = $true 
-				$update = $true
-			}
 			
 			if ($update) {
 				 $Context.ExecuteQuery()

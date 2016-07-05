@@ -243,9 +243,10 @@ Function Main {
         }
 
         #Site collection admin
-        $user = Get-MSSPOUser -Site $s.Url -Loginname $UserName
+		$scaUser = "SharePoint Service Administrator"
+        $user = Get-MSSPOUser -Site $s.Url -Loginname $scaUser
         if (!$user.IsSiteAdmin) {
-            Set-MSSPOUser -Site $s.Url -Loginname $UserName -IsSiteCollectionAdmin $true | Out-Null
+            Set-MSSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true | Out-Null
         }
 
 		#PNP

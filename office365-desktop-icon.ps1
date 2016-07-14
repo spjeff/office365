@@ -8,8 +8,8 @@
 .NOTES
 	File Name		: office365-desktop-icon.ps1
 	Author			: Jeff Jones - @spjeff
-	Version			: 0.06
-	Last Modified	: 07-01-2016
+	Version			: 0.07
+	Last Modified	: 07-14-2016
 .LINK
 	Source Code
 		http://www.github.com/spjeff/o365/office365-desktop-icon.ps1
@@ -33,7 +33,7 @@ $pw = Read-Host "Tenant - Password" -AsSecureString
 $hash = $pw | ConvertFrom-SecureString
 
 # command
-"(Get-Host).UI.RawUI.BackgroundColor=""DarkBlue""`n(Get-Host).UI.RawUI.ForegroundColor=""White""`nClear-Host`n`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS -ErrorAction SilentlyContinue`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP -ErrorAction SilentlyContinue`nConnect-MSSPOService -URL $url -Credential `$c`n`$firstUrl = (Get-MSSPOSite)[0].Url`nConnect-PNPSPOnline -URL `$firstUrl -Credential `$c`nGet-MSSPOSite`n" | Out-File "$home\o365-icon.ps1"
+"(Get-Host).UI.RawUI.BackgroundColor=""DarkBlue""`n(Get-Host).UI.RawUI.ForegroundColor=""White""`nClear-Host`n`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS -ErrorAction SilentlyContinue`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP -ErrorAction SilentlyContinue`nConnect-MSSPOService -URL $url -Credential `$c`n`$firstUrl = (Get-MSSPOSite)[0].Url`n$pnp = gcm Connect-PNPSPOnline -ErrorAction SilentlyContinue`n$pnpurl = ""https://github.com/OfficeDev/PnP-PowerShell""`nif ($pnp) {`nConnect-PNPSPOnline -URL `$firstUrl -Credential `$c`n} else {`nWrite-Warning ""Missing PNP cmds. Download at $pnpurl""`nstart $pnpurl`n}`nGet-MSSPOSite`n" | Out-File "$home\o365-icon.ps1"
 
 # create desktop shortcut
 $folder = [Environment]::GetFolderPath("Desktop")

@@ -8,7 +8,7 @@
 .NOTES
 	File Name		: office365-desktop-icon.ps1
 	Author			: Jeff Jones - @spjeff
-	Version			: 0.08
+	Version			: 0.09
 	Last Modified	: 07-14-2016
 .LINK
 	Source Code
@@ -32,7 +32,7 @@ $pw = Read-Host "Tenant - Password" -AsSecureString
 $hash = $pw | ConvertFrom-SecureString
 
 # command
-"`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS -ErrorAction SilentlyContinue`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP -ErrorAction SilentlyContinue`nConnect-MSSPOService -URL $url -Credential `$c`n`$firstUrl = (Get-MSSPOSite)[0].Url`n$pnp = gcm Connect-PNPSPOnline -ErrorAction SilentlyContinue`n$pnpurl = ""https://github.com/OfficeDev/PnP-PowerShell""`nif ($pnp) {`nConnect-PNPSPOnline -URL `$firstUrl -Credential `$c`n} else {`nWrite-Warning ""Missing PNP cmds. Download at $pnpurl""`nstart $pnpurl`n}`nGet-MSSPOSite`n" | Out-File "$home\o365-icon.ps1"
+"`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix MS -ErrorAction SilentlyContinue`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix PNP -ErrorAction SilentlyContinue`nConnect-MSSPOService -URL $url -Credential `$c`n`$firstUrl = (Get-MSSPOSite)[0].Url`n`$pnp = gcm Connect-PNPSPOnline -ErrorAction SilentlyContinue`n`$pnpurl = ""https://github.com/OfficeDev/PnP-PowerShell""`nif (`$pnp) {`nConnect-PNPSPOnline -URL `$firstUrl -Credential `$c`n} else {`nWrite-Warning ""Missing PNP cmds. Download at $pnpurl""`nstart $pnpurl`n}`nGet-MSSPOSite`n" | Out-File "$home\o365-icon.ps1"
 
 # create desktop shortcut
 $folder = [Environment]::GetFolderPath("Desktop")
@@ -40,6 +40,7 @@ $TargetFile = "c:\Windows\System32\cmd.exe"
 $ShortcutFile = "$folder\Office365.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.Arguments = "/c ""start powershell -noexit """"$home\o365-icon.ps1"""""""
 $Shortcut.IconLocation = "powershell.exe, 0";
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()

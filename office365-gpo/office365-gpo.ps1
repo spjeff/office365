@@ -10,8 +10,7 @@ Office365 - Group Policy
 #>
 
 #Core
-workflow GPOWorkflow {
-    param ($sites, $UserName, $Password)
+workflow GPOWorkflow { param ($sites, $UserName, $Password)
 
 	Function VerifySite([string]$SiteUrl, $UserName, $Password) {
 		Function Get-SPOCredentials([string]$UserName,[string]$Password) {
@@ -50,7 +49,6 @@ workflow GPOWorkflow {
 				$action.Sequence = $Sequence
 				$action.Update()
 				$Context.ExecuteQuery()
-				"ADDED"
 			}
 		}
 		Function Verify-Features([Microsoft.SharePoint.Client.ClientContext]$Context) {	
@@ -63,7 +61,7 @@ workflow GPOWorkflow {
 			$id = New-Object System.Guid "0af5989a-3aea-4519-8ab0-85d91abe39ff"
 			$found = $feat |? {$_.DefinitionId -eq $id}
 			if (!$found) {
-				$featSite.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
+				$feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
 			}
             $Context.ExecuteQuery()
 
@@ -71,17 +69,17 @@ workflow GPOWorkflow {
             Loop-WebFeature $Context $Context.Web $false "87294c72-f260-42f3-a41b-981a2ffce37a"
 		}
         Function Loop-WebFeature ($Context, $currWeb, $wantActive, $featureId) {
-            #Current web
+            #current web
             Ensure-WebFeature $Context $currWeb $wantActive $featureId
 
-            #Get child subwebs
+            #get child subwebs
             $webs = $currWeb.Webs
             $Context.Load($webs)
             $Context.ExecuteQuery()
 			
-			#Loop child subwebs
+			#loop child subwebs
             foreach ($web in $webs) {
-                #Child web
+                #child web
                 Ensure-WebFeature $Context $web $wantActive $featureId
 
                 #Recurse
@@ -92,7 +90,7 @@ workflow GPOWorkflow {
             }
         }
         Function Ensure-WebFeature ($Context, $web, $wantActive, $featureId) {
-            #List of Web features
+            #list of Web features
             if ($web.Url) {
                 Write-Host " - $($web.Url)"
 			    $feat = $web.Features
@@ -111,16 +109,30 @@ workflow GPOWorkflow {
             }
         }
 		Function Verify-General([Microsoft.SharePoint.Client.ClientContext]$Context) {
-			#SPSite Collection
+			#Defaults
 			$update = $false
+			
+			#SPSite
 			$site = $Context.Site
 			$Context.Load($site)
 			$Context.ExecuteQuery()
 			
-			#RootWeb
-			$root = $Context.Site.RootWeb
-			$Context.Load($root)
+			#SPWeb
+			$rootWeb = $site.RootWeb
+			$Context.Load($rootWeb)
 			$Context.ExecuteQuery()
+			
+			#Access Request SPList
+			<#
+			$arList = $rootWeb.Lists.GetByTitle("Access Requests");
+			$Context.Load($arList)
+			$Context.ExecuteQuery()
+			if ($arList) {
+				$arList.Hidden = $false
+				$arList.Update()
+				$update = $true
+			}
+			#>
 
 			#Trim Audit Log
             if (!$site.TrimAuditLog) {
@@ -130,25 +142,15 @@ workflow GPOWorkflow {
             }
 			
 			#Audit Log Storage
-			if (!$root.AllProperties["_auditlogreportstoragelocation"]) {
+			if (!$rootWeb.AllProperties["_auditlogreportstoragelocation"]) {
 				$url = $Context.Site.ServerRelativeUrl
 				if ($url -eq "/") {$url = ""}
-				$root.AllProperties["_auditlogreportstoragelocation"] = "$url/SiteAssets"
-				$root.Update()
-				$Context.ExecuteQuery()
-			}
-			
-			#Access Request list
-			$arList = $root.Lists.GetByTitle("Access Requests");
-			$Context.Load($arList)
-			$Context.ExecuteQuery()
-			if ($arList) {
-				$arList.Hidden = $false
-				$arList.Update()
+				$rootWeb.AllProperties["_auditlogreportstoragelocation"] = "$url/SiteAssets"
+				$rootWeb.Update()
 				$update = $true
 			}
 			
-			#Update if needed
+			#Update
 			if ($update) {
 				 $Context.ExecuteQuery()
 			}
@@ -161,6 +163,7 @@ workflow GPOWorkflow {
 		Try {
 			$context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
 			$cred = Get-SPOCredentials -UserName $UserName -Password $Password
+			$context.Credentials = $cred
 
 			#JS CUSTOM ACTION
 			$scriptUrl = "https://tenant.sharepoint.com/SiteAssets/Office365-GPO/jquery-2.2.3.js"
@@ -186,7 +189,6 @@ workflow GPOWorkflow {
 		Write-Output "Start thread >> $($s.Url)"
 		VerifySite $s.Url $UserName $Password
 	}
-
 	"DONE"
 }
 
@@ -201,7 +203,7 @@ Function Main {
 	#Config
 	$AdminUrl = "https://tenant-admin.sharepoint.com"
 	$UserName = "user@tenant.onmicrosoft.com"
-	$Password = "P@ssw0rd"
+	$Password = "Pass@word1"
 	
 	#Credential
 	$secpw = ConvertTo-SecureString -String $Password -AsPlainText -Force
@@ -214,12 +216,12 @@ Function Main {
 	Write-Host "Opening list of sites ... " -Fore Green
 	$sites = Get-MSPOSite
 	$sites.Count
-	
 
 	#Serial loop
     Write-Host "Serial loop"
     ForEach ($s in $sites) {
         Write-Host "." -NoNewLine
+		#SPO
         #Storage quota
         if (!$s.StorageQuota) {
             Set-MSPOSite -Identity $s.Url -StorageQuota 2000 -StorageQuotaWarningLevel 1900
@@ -227,7 +229,7 @@ Function Main {
         }
 
         #Site collection admin
-		$scaUser = $UserName
+		$scaUser = $UserName #REM "SharePoint Service Administrator"
         $user = Get-MSPOUser -Site $s.Url -Loginname $scaUser
         if (!$user.IsSiteAdmin) {
             Set-MSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true | Out-Null
@@ -245,7 +247,7 @@ Function Main {
    	#Parallel loop
 	#CSOM
     Write-Host "Parallel loop"
-	GPOWorkflow $sites $cred
+	GPOWorkflow $sites $UserName $Password
 
 	#Duration
 	$min = [Math]::Round(((Get-Date) - $start).TotalMinutes, 2)

@@ -4,6 +4,8 @@ Office365 - Group Policy
  * hide Site Setting links
  * hide Site Features
  * hide Web Features
+ 
+ * last updated 07-19-16
 */
 
 (function() {
@@ -72,7 +74,8 @@ Office365 - Group Policy
 								'SharePoint 2007 Workflows',
 								'SharePoint Server Publishing Infrastructure',
 								
-								'Site Policy'
+								'Site Policy',
+								'Workflows'
 								];
 				$.each(features, function(i, feature) {
 					hideSPFeature(feature);
@@ -98,6 +101,10 @@ Office365 - Group Policy
 				$.each(links, function(i, sel) {
 					$(sel).remove();
 				});
+				
+				//create link
+				var group = $('h3.ms-linksection-title:contains("Users and Permissions")').parent().children('ul');
+				group.append('<li class="ms-linksection-listItem"><a title="Change site owner." href="/_layouts/15/setrqacc.aspx?type=web">Change Site Owner</a></li>');
 			}
 		}
 		

@@ -7,6 +7,8 @@ Office365 - Group Policy
  * apply Site Collection quota 2GB
  * enable Site Collection auditing
  * enable Site Collection Custom Action JS (JQuery + "office365-gpo.js")
+ 
+ * last updated 07-19-16
 #>
 
 #Core
@@ -66,20 +68,25 @@ workflow GPOWorkflow { param ($sites, $UserName, $Password)
             $Context.ExecuteQuery()
 
             #SPWeb - Disable Minimal Download Strategy (MDS)
-            Loop-WebFeature $Context $Context.Web $false "87294c72-f260-42f3-a41b-981a2ffce37a"
+            Loop-WebFeature $Context $Context.Site.RootWeb $false "87294c72-f260-42f3-a41b-981a2ffce37a"
 		}
         Function Loop-WebFeature ($Context, $currWeb, $wantActive, $featureId) {
-            #current web
+            #get parent
+            $Context.Load($currWeb)
+            $Context.ExecuteQuery()
+			
+			#ensure parent
             Ensure-WebFeature $Context $currWeb $wantActive $featureId
 
-            #get child subwebs
+            #get child
             $webs = $currWeb.Webs
             $Context.Load($webs)
             $Context.ExecuteQuery()
 			
 			#loop child subwebs
             foreach ($web in $webs) {
-                #child web
+				Write-Host "ensure feature on " + $web.url
+                #ensure child
                 Ensure-WebFeature $Context $web $wantActive $featureId
 
                 #Recurse
@@ -101,11 +108,19 @@ workflow GPOWorkflow { param ($sites, $UserName, $Password)
                 $id = New-Object System.Guid $featureId
                 $found = $feat |? {$_.DefinitionId -eq $id}
                 if ($wantActive) {
-                    if (!$found) {$feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)}
+					Write-Host "ADD FEAT" -Fore Yellow
+                    if (!$found) {
+						$feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
+						$Context.ExecuteQuery()
+					}
                 } else {
-			        if ($found) {$feat.Remove($id, $true)}
+					Write-Host "REMOVE FEAT" -Fore Yellow
+			        if ($found) {
+						$feat.Remove($id, $true)
+						$Context.ExecuteQuery()
+					}
                 }
-                $Context.ExecuteQuery()
+				#no changes. already OK
             }
         }
 		Function Verify-General([Microsoft.SharePoint.Client.ClientContext]$Context) {
@@ -202,8 +217,8 @@ Function Main {
 	
 	#Config
 	$AdminUrl = "https://tenant-admin.sharepoint.com"
-	$UserName = "user@tenant.onmicrosoft.com"
-	$Password = "Pass@word1"
+	$UserName = "admin@tenant.onmicrosoft.com"
+	$Password = "pass@word1"
 	
 	#Credential
 	$secpw = ConvertTo-SecureString -String $Password -AsPlainText -Force
@@ -229,10 +244,10 @@ Function Main {
         }
 
         #Site collection admin
-		$scaUser = $UserName #REM "SharePoint Service Administrator"
-        $user = Get-MSPOUser -Site $s.Url -Loginname $scaUser
+		$scaUser = "SharePoint Service Administrator"
+        $user = Get-MSPOUser -Site $s.Url -Loginname $scaUser -ErrorAction SilentlyContinue
         if (!$user.IsSiteAdmin) {
-            Set-MSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true | Out-Null
+            Set-MSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true -ErrorAction SilentlyContinue | Out-Null
         }
 
 		#PNP

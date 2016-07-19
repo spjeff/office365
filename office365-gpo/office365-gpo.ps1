@@ -7,12 +7,10 @@ Office365 - Group Policy
  * apply Site Collection quota 2GB
  * enable Site Collection auditing
  * enable Site Collection Custom Action JS (JQuery + "office365-gpo.js")
- 
- * last updated 07-19-16
 #>
 
 #Core
-workflow GPOWorkflow { param ($sites, $UserName, $Password)
+function GPOWorkflow ($sites, $UserName, $Password) {
 
 	Function VerifySite([string]$SiteUrl, $UserName, $Password) {
 		Function Get-SPOCredentials([string]$UserName,[string]$Password) {
@@ -175,7 +173,7 @@ workflow GPOWorkflow { param ($sites, $UserName, $Password)
 		[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client") | Out-Null
 		[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client.Runtime") | Out-Null
 				
-		Try {
+		#Try {
 			$context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
 			$cred = Get-SPOCredentials -UserName $UserName -Password $Password
 			$context.Credentials = $cred
@@ -193,14 +191,15 @@ workflow GPOWorkflow { param ($sites, $UserName, $Password)
 			Verify-Features -Context $context
 
 			$context.Dispose()
-		} Catch {
-			Write-Error "ERROR -- $SiteUrl -- $($_.Exception.Message)"
-		}
+		#} Catch {
+		#	Write-Error "ERROR -- $SiteUrl -- $($_.Exception.Message)"
+		#}
 	}
 
 
 	#Parallel Loop - CSOM
-	ForEach -Parallel -ThrottleLimit 100 ($s in $sites) {
+	#-Parallel -ThrottleLimit 100 
+	ForEach ($s in $sites) {
 		Write-Output "Start thread >> $($s.Url)"
 		VerifySite $s.Url $UserName $Password
 	}
@@ -218,7 +217,7 @@ Function Main {
 	#Config
 	$AdminUrl = "https://tenant-admin.sharepoint.com"
 	$UserName = "admin@tenant.onmicrosoft.com"
-	$Password = "pass@word1"
+	$Password = "pass@word1
 	
 	#Credential
 	$secpw = ConvertTo-SecureString -String $Password -AsPlainText -Force

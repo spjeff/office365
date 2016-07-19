@@ -10,7 +10,8 @@ Office365 - Group Policy
 #>
 
 #Core
-function GPOWorkflow ($sites, $UserName, $Password) {
+workflow GPOWorkflow {
+param ($sites, $UserName, $Password)
 
 	Function VerifySite([string]$SiteUrl, $UserName, $Password) {
 		Function Get-SPOCredentials([string]$UserName,[string]$Password) {
@@ -173,7 +174,7 @@ function GPOWorkflow ($sites, $UserName, $Password) {
 		[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client") | Out-Null
 		[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client.Runtime") | Out-Null
 				
-		#Try {
+		try {
 			$context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
 			$cred = Get-SPOCredentials -UserName $UserName -Password $Password
 			$context.Credentials = $cred
@@ -191,15 +192,14 @@ function GPOWorkflow ($sites, $UserName, $Password) {
 			Verify-Features -Context $context
 
 			$context.Dispose()
-		#} Catch {
-		#	Write-Error "ERROR -- $SiteUrl -- $($_.Exception.Message)"
-		#}
+		} catch {
+			Write-Error "ERROR -- $SiteUrl -- $($_.Exception.Message)"
+		}
 	}
 
 
 	#Parallel Loop - CSOM
-	#-Parallel -ThrottleLimit 100 
-	ForEach ($s in $sites) {
+	ForEach -Parallel -ThrottleLimit 100 ($s in $sites) {
 		Write-Output "Start thread >> $($s.Url)"
 		VerifySite $s.Url $UserName $Password
 	}
@@ -217,7 +217,7 @@ Function Main {
 	#Config
 	$AdminUrl = "https://tenant-admin.sharepoint.com"
 	$UserName = "admin@tenant.onmicrosoft.com"
-	$Password = "pass@word1
+	$Password = "pass@word1"
 	
 	#Credential
 	$secpw = ConvertTo-SecureString -String $Password -AsPlainText -Force
@@ -244,10 +244,12 @@ Function Main {
 
         #Site collection admin
 		$scaUser = "SharePoint Service Administrator"
-        $user = Get-MSPOUser -Site $s.Url -Loginname $scaUser -ErrorAction SilentlyContinue
-        if (!$user.IsSiteAdmin) {
-            Set-MSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true -ErrorAction SilentlyContinue | Out-Null
-        }
+		try {
+			$user = Get-MSPOUser -Site $s.Url -Loginname $scaUser -ErrorAction SilentlyContinue
+			if (!$user.IsSiteAdmin) {
+				Set-MSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true -ErrorAction SilentlyContinue | Out-Null
+			}
+		} catch {}
 
 		#PNP
         Connect-PSPOnline -Url $s.Url -Credentials $c

@@ -1,6 +1,6 @@
 SELECT G.*,
 A.[Files-XOML],A.[Files-XSN],A.[Files-CSS],A.[Files-JS],A.[Files-JQuery],A.[Files-Angular],A.[Files-Bootstrap],
-B.[Lists-Over5KItems],B.[Lists-Unthrottled],B.[Lists-NumInboundEmail],B.[Lists-LastModifiedInboundEmail],
+B.[Lists-Over5KItems],B.[Lists-Unthrottled],B.[Lists-NumInboundEmail],B.[Lists-LastModifiedInboundEmail],B.[Lists-LastModified],
 C.[Feature-PublishingSite],C.[Feature-MinimalPublishingSite],
 D.[Feature-PublishingWeb],D.[Feature-MinimalPublishingWeb],
 E.[Alerts-Immed],

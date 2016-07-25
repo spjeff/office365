@@ -10,7 +10,7 @@ FROM
 	SELECT Webs.Id,
 	SUM(CASE WHEN ((AllDocs.ExtensionForFile = 'xoml') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-XOML',
 	SUM(CASE WHEN ((AllDocs.ExtensionForFile = 'xsn') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-XSN',
-	SUM(CASE WHEN ((AllDocs.ExtensionForFile = 'css') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-CSS',
+	SUM(CASE WHEN ((AllDocs.ExtensionForFile = 'css') AND (AllDocs.DirName NOT LIKE '%_catalogs%') AND (AllDocs.DirName NOT LIKE '%en-us%Core Styles%')) THEN 1 ELSE 0 END) AS 'Files-CSS',
 	SUM(CASE WHEN ((AllDocs.ExtensionForFile = 'js') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-JS',
 	SUM(CASE WHEN ((AllDocs.LeafName LIKE '%jquery%js') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-JQuery',
 	SUM(CASE WHEN ((AllDocs.LeafName LIKE '%angular%js') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-Angular',

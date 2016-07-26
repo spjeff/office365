@@ -3,14 +3,14 @@ Desktop Icon to launch Office 365 PowerShell
 
 
 ## Description
-Check this video out to see a Desktop Icon that launches PowerShell and automatically logs in to your Office 365 Tenant URL.   It leverages both the SPO (TechNet) and PNP (GitHub) cmdlets to open two connections.   From here, you can easily work on your O365 tenant without having to memorize login steps and repeat each time.  From blog post - 
+Check this video out to see a Desktop Icon that launches PowerShell and automatically logs in to your Office 365 Tenant URL.   It leverages both the SPO (TechNet) and PNP (GitHub) cmdlets to open two connections.   From here, you can easily work on your O365 tenant without having to memorize login steps and repeat each time.  From blog post - [http://www.spjeff.com/2016/07/26/desktop-icon-launch-office-365-powershell/](http://www.spjeff.com/2016/07/26/desktop-icon-launch-office-365-powershell/)
 
 ## Sceenshot
 ![image](http://www.spjeff.com/wp-content/ftp_uploads/48900ff24251_D30B/image.png)
 ![image](http://www.spjeff.com/wp-content/ftp_uploads/48900ff24251_D30B/2016-07-26_14-42-35.png)
 
 ## Video
-[![](https://raw.githubusercontent.com/spjeff/spcrud/master/doc/7.png)](http://www.spjeff.com/2016/04/10/video-get-started-with-spcrud-js/ "Get Started with O365 Desktop Icon")
+[![](https://raw.githubusercontent.com/spjeff/o365/master/doc/video_thumb.png)](http://www.spjeff.com/2016/07/26/desktop-icon-launch-office-365-powershell/ "VIDEO - Desktop Icon to launch Office 365 PowerShell")
 
 ## Contact
 Please drop a line to [@spjeff](https://twitter.com/spjeff) or [spjeff@spjeff.com](mailto:spjeff@spjeff.com)

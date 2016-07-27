@@ -10,7 +10,7 @@ Check this video out to see a Desktop Icon that launches PowerShell and automati
 ![image](http://www.spjeff.com/wp-content/ftp_uploads/48900ff24251_D30B/2016-07-26_14-42-35.png)
 
 ## Video
-[![](https://raw.githubusercontent.com/spjeff/office365/master/office365-desktop-icon/video_thumb.png)](http://www.spjeff.com/2016/07/26/desktop-icon-launch-office-365-powershell/ "VIDEO - Desktop Icon to launch Office 365 PowerShell")
+[![](https://raw.githubusercontent.com/spjeff/office365/master/office365-desktop-icon/video_thumb.png)](https://vimeo.com/176372983 "VIDEO - Desktop Icon to launch Office 365 PowerShell")
 
 ## Contact
 Please drop a line to [@spjeff](https://twitter.com/spjeff) or [spjeff@spjeff.com](mailto:spjeff@spjeff.com)

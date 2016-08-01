@@ -1,3 +1,9 @@
+[CmdletBinding()]
+param (
+	[Parameter(Mandatory=$false, Position=0, ValueFromPipeline=$false, HelpMessage='Optional URL to configure one site only')]
+	[Alias("url")]
+	[string]$matchURL
+)
 <#
 Office365 - Group Policy
 
@@ -227,8 +233,12 @@ Function Main {
 	Connect-MSPOService -URL $AdminUrl -Credential $c
 	
 	#Scope
-	Write-Host "Opening list of sites ... " -Fore Green
-	$sites = Get-MSPOSite
+	Write-Host "Opening list of sites ... $matchURL" -Fore Green
+	if ($matchURL) {
+		$sites = Get-MSPOSite -Filter "url -like ""$matchURL"""
+	} else {
+		$sites = Get-MSPOSite
+	}
 	$sites.Count
 
 	#Serial loop

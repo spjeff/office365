@@ -5,7 +5,7 @@ Office365 - Group Policy
  * hide Site Features
  * hide Web Features
  
- * last updated 08-01-16
+ * last updated 08-12-16
 */
 
 (function() {
@@ -127,7 +127,7 @@ Office365 - Group Policy
 
                 //append new child link
                 var li = document.createElement("li")
-                li.innerHTML = '<a title="Change site owner." href="/_layouts/15/setrqacc.aspx?type=web">Change Site Owner</a>'
+                li.innerHTML = '<a title="Change site owner." href="setrqacc.aspx?type=web">Change Site Owner</a>'
                 group.appendChild(li);
             }
         }

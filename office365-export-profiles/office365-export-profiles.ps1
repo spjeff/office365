@@ -1,4 +1,5 @@
 # Export Office 365 user profiles to CSV (Azure AD & SharePoint UPS)
+Import-Module MSOnline
 
 # Tenant
 $tenantUrl = "https://tenant-admin.sharepoint.com/"

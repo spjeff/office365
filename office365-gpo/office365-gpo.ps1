@@ -29,23 +29,23 @@ param ($sites, $UserName, $Password)
 		   }
 		   return New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($UserName, $SecurePassword)
 		}
-		Function Get-ActionBySequence([Microsoft.SharePoint.Client.ClientContext]$Context,[int]$Sequence) {
-			 $customActions = $Context.Site.UserCustomActions
-			 $Context.Load($customActions)
-			 $Context.ExecuteQuery()
+		Function Get-ActionBySequence([Microsoft.SharePoint.Client.ClientContext]$context,[int]$Sequence) {
+			 $customActions = $context.Site.UserCustomActions
+			 $context.Load($customActions)
+			 $context.ExecuteQuery()
 			 $customActions | where { $_.Sequence -eq $Sequence }
 		}
 		Function Delete-Action($UserCustomAction) {
-			 $Context = $UserCustomAction.Context
+			 $context = $UserCustomAction.Context
 			 $UserCustomAction.DeleteObject()
-			 $Context.ExecuteQuery()
+			 $context.ExecuteQuery()
 			 "DELETED"
 		}
-		Function Verify-ScriptLinkAction([Microsoft.SharePoint.Client.ClientContext]$Context,[string]$ScriptSrc,[string]$ScriptBlock, [int]$Sequence) {
-			$actions = Get-ActionBySequence -Context $Context -Sequence $Sequence
+		Function Verify-ScriptLinkAction([Microsoft.SharePoint.Client.ClientContext]$context,[string]$ScriptSrc,[string]$ScriptBlock, [int]$Sequence) {
+			$actions = Get-ActionBySequence -Context $context -Sequence $Sequence
 			
 			if (!$actions) {
-				$action = $Context.Site.UserCustomActions.Add();
+				$action = $context.Site.UserCustomActions.Add();
 				$action.Location = "ScriptLink"
 				if($ScriptSrc) {
 					$action.ScriptSrc = $ScriptSrc
@@ -55,14 +55,14 @@ param ($sites, $UserName, $Password)
 				}
 				$action.Sequence = $Sequence
 				$action.Update()
-				$Context.ExecuteQuery()
+				$context.ExecuteQuery()
 			}
 		}
-		Function Verify-Features([Microsoft.SharePoint.Client.ClientContext]$Context) {	
+		Function Verify-Features([Microsoft.SharePoint.Client.ClientContext]$context) {	
 			#list of Site features
-            $feat = $Context.Site.Features
-            $Context.Load($feat)
-			$Context.ExecuteQuery()
+            $feat = $context.Site.Features
+            $context.Load($feat)
+			$context.ExecuteQuery()
 			
 			#SPSite - Enable Workflow
 			$id = New-Object System.Guid "0af5989a-3aea-4519-8ab0-85d91abe39ff"
@@ -70,44 +70,44 @@ param ($sites, $UserName, $Password)
 			if (!$found) {
 				$feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
 			}
-            $Context.ExecuteQuery()
+            $context.ExecuteQuery()
 
             #SPWeb - Disable Minimal Download Strategy (MDS)
-            Loop-WebFeature $Context $Context.Site.RootWeb $false "87294c72-f260-42f3-a41b-981a2ffce37a"
+            Loop-WebFeature $context $context.Site.RootWeb $false "87294c72-f260-42f3-a41b-981a2ffce37a"
 		}
-        Function Loop-WebFeature ($Context, $currWeb, $wantActive, $featureId) {
+        Function Loop-WebFeature ($context, $currWeb, $wantActive, $featureId) {
             #get parent
-            $Context.Load($currWeb)
-            $Context.ExecuteQuery()
+            $context.Load($currWeb)
+            $context.ExecuteQuery()
 			
 			#ensure parent
-            Ensure-WebFeature $Context $currWeb $wantActive $featureId
+            Ensure-WebFeature $context $currWeb $wantActive $featureId
 
             #get child
             $webs = $currWeb.Webs
-            $Context.Load($webs)
-            $Context.ExecuteQuery()
+            $context.Load($webs)
+            $context.ExecuteQuery()
 			
 			#loop child subwebs
             foreach ($web in $webs) {
 				Write-Host "ensure feature on " + $web.url
                 #ensure child
-                Ensure-WebFeature $Context $web $wantActive $featureId
+                Ensure-WebFeature $context $web $wantActive $featureId
 
                 #Recurse
                 $subWebs = $web.Webs
-                $Context.Load($subWebs)
-                $Context.ExecuteQuery()
-                $subWebs | ForEach-Object { Loop-WebFeature $Context $_ $wantActive $featureId }
+                $context.Load($subWebs)
+                $context.ExecuteQuery()
+                $subWebs | ForEach-Object { Loop-WebFeature $context $_ $wantActive $featureId }
             }
         }
-        Function Ensure-WebFeature ($Context, $web, $wantActive, $featureId) {
+        Function Ensure-WebFeature ($context, $web, $wantActive, $featureId) {
             #list of Web features
             if ($web.Url) {
                 Write-Host " - $($web.Url)"
 			    $feat = $web.Features
-			    $Context.Load($feat)
-			    $Context.ExecuteQuery()
+			    $context.Load($feat)
+			    $context.ExecuteQuery()
 
                 #Disable/Enable Web features
                 $id = New-Object System.Guid $featureId
@@ -116,63 +116,61 @@ param ($sites, $UserName, $Password)
 					Write-Host "ADD FEAT" -Fore Yellow
                     if (!$found) {
 						$feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
-						$Context.ExecuteQuery()
+						$context.ExecuteQuery()
 					}
                 } else {
 					Write-Host "REMOVE FEAT" -Fore Yellow
 			        if ($found) {
 						$feat.Remove($id, $true)
-						$Context.ExecuteQuery()
+						$context.ExecuteQuery()
 					}
                 }
 				#no changes. already OK
             }
         }
-		Function Verify-General([Microsoft.SharePoint.Client.ClientContext]$Context) {
-			#Defaults
-			$update = $false
-			
+		Function Verify-General([Microsoft.SharePoint.Client.ClientContext]$context) {			
 			#SPSite
-			$site = $Context.Site
-			$Context.Load($site)
-			$Context.ExecuteQuery()
+			$site = $context.Site
+			$context.Load($site)
+			$context.ExecuteQuery()
 			
-			#SPWeb
+			#RootWeb
 			$rootWeb = $site.RootWeb
-			$Context.Load($rootWeb)
-			$Context.ExecuteQuery()
+			$context.Load($rootWeb)
+			$context.ExecuteQuery()
+
+			#RootLists
+			$rootLists = $rootWeb.Lists
+			$context.Load($rootLists)
+			$context.ExecuteQuery()
 			
-			#Access Request SPList
-			<#
-			$arList = $rootWeb.Lists.GetByTitle("Access Requests");
-			$Context.Load($arList)
-			$Context.ExecuteQuery()
+			#Access Request List
+			$arList = $rootLists.GetByTitle("Access Requests");
+			$context.Load($arList)
+			$context.ExecuteQuery()
 			if ($arList) {
-				$arList.Hidden = $false
-				$arList.Update()
-				$update = $true
+				if ($arList.Hidden) {
+					$arList.Hidden = $false
+					$arList.Update()
+					$context.ExecuteQuery()
+				}
 			}
-			#>
 
 			#Trim Audit Log
             if (!$site.TrimAuditLog) {
                 $site.TrimAuditLog = $true
 				$site.AuditLogTrimmingRetention = 180
-				$update = $true
+				$site.Update()
+				$context.ExecuteQuery()
             }
 			
 			#Audit Log Storage
 			if (!$rootWeb.AllProperties["_auditlogreportstoragelocation"]) {
-				$url = $Context.Site.ServerRelativeUrl
+				$url = $context.Site.ServerRelativeUrl
 				if ($url -eq "/") {$url = ""}
 				$rootWeb.AllProperties["_auditlogreportstoragelocation"] = "$url/SiteAssets"
 				$rootWeb.Update()
-				$update = $true
-			}
-			
-			#Update
-			if ($update) {
-				 $Context.ExecuteQuery()
+				$context.ExecuteQuery()
 			}
 		}
 		
@@ -262,8 +260,11 @@ Function Main {
 		#PNP
         Connect-PSPOnline -Url $s.Url -Credentials $c
 
-		# SharePoint Designer OFF
- 		Set-PSPOPropertyBagValue -Key allowdesigner -Value 0
+		# SharePoint Designer force OFF unless we see "keepspd=1" manual exclude flag ON
+		$keepspd = Get-PSPOPropertyBag -Key "keepspd"
+		if ($keepspd -ne 1) {
+ 			Set-PSPOPropertyBagValue -Key "allowdesigner" -Value 0
+		}
 
 		# Verify Auditing
         $audit = Get-PSPOAuditing

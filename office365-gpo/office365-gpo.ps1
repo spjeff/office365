@@ -261,6 +261,11 @@ Function Main {
 
 		#PNP
         Connect-PSPOnline -Url $s.Url -Credentials $c
+
+		# SharePoint Designer OFF
+ 		Set-PSPOPropertyBagValue -Key allowdesigner -Value 0
+
+		# Verify Auditing
         $audit = Get-PSPOAuditing
         if ($audit.AuditFlags -ne 7099) {
             Set-PSPOAuditing -RetentionTime 180 -TrimAuditLog -EditItems -CheckOutCheckInItems -MoveCopyItems -DeleteRestoreItems -EditContentTypesColumns -EditUsersPermissions -ErrorAction SilentlyContinue

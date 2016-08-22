@@ -21,25 +21,29 @@
     //hide site feature
     function hideSPFeature(name) {
         var headers = document.querySelectorAll('h3.ms-standardheader');
-        for (var i = 0; i < headers.length; i++) {
-            if (headers[i].innerText.indexOf(name) >= 0) {
-                headers[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display = 'none';
+        if (headers) {
+            for (var i = 0; i < headers.length; i++) {
+                if (headers[i].innerText.indexOf(name) >= 0) {
+                    headers[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display = 'none';
+                }
             }
         }
     }
 
     //remove alternating row color
     function hideAltRowColor() {
-        var rows = document.querySelectorAll('td.ms-featurealtrow');
+        var className = 'ms-featurealtrow';
+        var rows = document.querySelectorAll('td.' + className);
         if (rows) {
-            rows.forEach(function(el, i) {
-                var className = 'ms-featurealtrow';
+            for (var i = 0; i < rows.length; i++) {
+                var el = rows[i];
                 if (el.classList) {
                     el.classList.remove(className);
                 } else {
                     el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
                 }
-            });
+
+            }
         }
     }
 

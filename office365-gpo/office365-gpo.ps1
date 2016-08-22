@@ -35,7 +35,7 @@ param ($sites, $UserName, $Password)
 			 $Context.ExecuteQuery()
 			 $customActions | where { $_.Sequence -eq $Sequence }
 		}
-		Function Delete-Action([Microsoft.SharePoint.Client.UserCustomAction]$UserCustomAction) {
+		Function Delete-Action($UserCustomAction) {
 			 $Context = $UserCustomAction.Context
 			 $UserCustomAction.DeleteObject()
 			 $Context.ExecuteQuery()

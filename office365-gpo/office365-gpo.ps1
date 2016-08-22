@@ -12,7 +12,7 @@ Office365 - Group Policy
  * grant Site Collection Admin for support staff
  * apply Site Collection quota 2GB
  * enable Site Collection auditing
- * enable Site Collection Custom Action JS (JQuery + "office365-gpo.js")
+ * enable Site Collection Custom Action JS ("office365-gpo.js")
 #>
 
 #Core
@@ -186,8 +186,6 @@ param ($sites, $UserName, $Password)
 			$context.Credentials = $cred
 
 			#JS CUSTOM ACTION
-			$scriptUrl = "https://tenant.sharepoint.com/SiteAssets/Office365-GPO/jquery-2.2.3.js"
-			Verify-ScriptLinkAction -Context $context -ScriptSrc $scriptUrl -Sequence 2000
 			$scriptUrl = "https://tenant.sharepoint.com/SiteAssets/Office365-GPO/office365-gpo.js"
 			Verify-ScriptLinkAction -Context $context -ScriptSrc $scriptUrl -Sequence 2001
 

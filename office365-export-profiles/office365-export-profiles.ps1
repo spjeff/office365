@@ -1,4 +1,6 @@
 # Export Office 365 user profiles to CSV (Azure AD & SharePoint UPS)
+# Download from ... Microsoft Online Services Sign-in Assistant for IT Professionals RTW http://go.microsoft.com/fwlink/p/?LinkId=286152
+# Download from ... Windows Azure Active Directory Module for Windows PowerShell (64-bit version) http://go.microsoft.com/fwlink/p/?linkid=236297
 Import-Module MSOnline
 
 # Tenant

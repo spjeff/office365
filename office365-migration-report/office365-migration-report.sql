@@ -1,5 +1,5 @@
 SELECT G.*,
-A.[Files-XOML],A.[Files-XSN],A.[Files-CSS],A.[Files-JS],A.[Files-JQuery],A.[Files-Angular],A.[Files-Bootstrap],
+A.[Files-XOML],A.[Files-XSN],A.[Files-CSS],A.[Files-JS],A.[Files-JQuery],A.[Files-Angular],A.[Files-Bootstrap],A.[Files-UrlOver260],A.[Files-CheckedOut],
 B.[Lists-Over5KItems],B.[Lists-Unthrottled],B.[Lists-NumInboundEmail],B.[Lists-LastModifiedInboundEmail],B.[Lists-LastModified],
 C.[Feature-PublishingSite],C.[Feature-MinimalPublishingSite],
 D.[Feature-PublishingWeb],D.[Feature-MinimalPublishingWeb],
@@ -14,7 +14,11 @@ FROM
 	SUM(CASE WHEN ((AllDocs.ExtensionForFile = 'js') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-JS',
 	SUM(CASE WHEN ((AllDocs.LeafName LIKE '%jquery%js') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-JQuery',
 	SUM(CASE WHEN ((AllDocs.LeafName LIKE '%angular%js') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-Angular',
-	SUM(CASE WHEN ((AllDocs.LeafName LIKE '%bootstrap%css') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-Bootstrap'
+	SUM(CASE WHEN ((AllDocs.LeafName LIKE '%bootstrap%css') AND (AllDocs.DirName NOT LIKE '%_catalogs%')) THEN 1 ELSE 0 END) AS 'Files-Bootstrap',
+	SUM(CASE WHEN (LEN(AllDocs.DirName)+LEN(AllDocs.LeafName)+1>=260 AND AllDocs.IsCurrentVersion = 1 AND AllDocs.DeleteTransactionId = 0 ) THEN 1 ELSE 0 END) AS 'Files-UrlOver260',
+	SUM(CASE WHEN (AllDocs.DeleteTransactionId=0 AND AllDocs.IsCurrentVersion=1 AND (AllDocs.CheckoutUserId IS NOT NULL OR AllDocs.LTCheckoutUserId IS NOT NULL OR Level=255))  THEN 1 ELSE 0 END) AS 'Files-CheckedOut'
+
+
 	FROM Webs
 	LEFT JOIN AllDocs
 	ON Webs.Id = AllDocs.WebId

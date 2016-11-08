@@ -33,7 +33,6 @@ foreach ($u in $allUsers) {
 	$eta = (Get-Date).AddSeconds($remain)
 	
 	# Display
-	$file = $site.Url.Split('/')[4]
 	Write-Progress -Activity "Download SharePoint Online user profiles - ETA $eta" -Status "$prct" -PercentComplete $prct
 	
 	# Append CSV sign in name

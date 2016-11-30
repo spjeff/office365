@@ -3,12 +3,12 @@
     Issue a call to SharePoint Online to delete all metadata from on-premises content that was
     indexed through cloud hybrid search. This operation is asynchronous.
 .PARAMETER PortalUrl
-    SharePoint Online portal URL, for example 'https://contoso.sharepoint.com'.
+    SharePoint Online portal URL, for example 'https://tenant.sharepoint.com'.
 .PARAMETER Credential
     Logon credential for tenant admin. Will prompt for credential if not specified.
 #>
 param(
-    [Parameter(Mandatory=$true, HelpMessage="SharePoint Online portal URL, for example 'https://contoso.sharepoint.com'.")]
+    [Parameter(Mandatory=$true, HelpMessage="SharePoint Online portal URL, for example 'https://tenant.sharepoint.com'.")]
     [ValidateNotNullOrEmpty()]
     [String] $PortalUrl,
 

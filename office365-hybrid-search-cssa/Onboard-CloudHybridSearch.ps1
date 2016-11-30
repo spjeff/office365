@@ -3,14 +3,14 @@
     When you run this script you onboard your SharePoint Online (SPO) tenant and your SharePoint server cloud SSA to cloud hybrid search.
     This includes setting up server to server authentication between SharePoint Online and SharePoint Server
 .PARAMETER PortalUrl
-    SharePoint Online portal URL, for example 'https://fmacpt.sharepoint.com'.
+    SharePoint Online portal URL, for example 'https://tenant.sharepoint.com'.
 .PARAMETER CloudSsaId
     Name or id (Guid) of the cloud Search service application, created with the CreateCloudSSA script.
 .PARAMETER Credential
     Logon credential for tenant admin. Will prompt for credential if not specified.
 #>
 Param(
-    [Parameter(Mandatory=$true, HelpMessage="SharePoint Online portal URL, for example 'https://fmacpt.sharepoint.com'.")]
+    [Parameter(Mandatory=$true, HelpMessage="SharePoint Online portal URL, for example 'https://tenant.sharepoint.com'.")]
     [ValidateNotNullOrEmpty()]
     [string] $PortalUrl,
 
@@ -344,8 +344,12 @@ try
 
     Write-Host "Connecting to content farm in SPO..." -foreground Yellow
     $cctx = [ClientContextHelper]::GetAppClientContext($PortalUrl)
+	Write-Host "Context:"
+	$cctx 
     $pushTenantManager = new-object Microsoft.SharePoint.Client.Search.ContentPush.PushTenantManager $cctx
-
+	Write-Host "PushTenantManager:"
+	$pushTenantManager 
+	
     # Retry up to 4 minutes, mitigate 401 Unauthorized from CSOM
     Write-Host "Preparing tenant for cloud hybrid search (this can take a couple of minutes)..." -foreground Yellow
     for ($i = 1; $i -le 12; $i++) {

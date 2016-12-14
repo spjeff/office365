@@ -105,7 +105,7 @@ Write-Output "Activating topology"
 $topology.Activate()     
 $timeoutTime=(Get-Date).AddMinutes(20)      
 do {Write-Output .;Start-Sleep 10;} while (($searchApp.GetTopology($topology.TopologyId).State -ne "Active") -and ($timeoutTime -ge (Get-Date)))      
-if ($searchApp.GetTopology($topology.TopologyId).State -ne "Active")  { throw ‘Could not activate the search topology’}      
+if ($searchApp.GetTopology($topology.TopologyId).State -ne "Active")  { throw 'Could not activate the search topology'}      
 Write-Output "Creating Proxy"      
 $searchAppProxy = new-spenterprisesearchserviceapplicationproxy -name ($SearchServiceAppName+"_proxy") -SearchApplication $searchApp      
 Write-Output " Cloud hybrid search service application provisioning completed successfully."      

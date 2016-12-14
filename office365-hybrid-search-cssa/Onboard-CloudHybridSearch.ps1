@@ -21,7 +21,7 @@ Param(
     [Parameter(Mandatory=$false, HelpMessage="Logon credential for tenant admin. Will be prompted if not specified.")]
     [PSCredential] $Credential
 )
-
+Start-Transcript
 if ($ACS_APPPRINCIPALID -eq $null) {
     New-Variable -Option Constant -Name ACS_APPPRINCIPALID -Value '00000001-0000-0000-c000-000000000000'
     New-Variable -Option Constant -Name ACS_HOST -Value "accounts.accesscontrol.windows.net"
@@ -413,3 +413,4 @@ catch
     Write-Host "It is safe to re-run onboarding if you believe this error is transient." -Foreground Yellow
     return
 }
+Stop-Transcript

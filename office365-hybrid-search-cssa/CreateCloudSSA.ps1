@@ -6,7 +6,8 @@ Param(
 [Parameter(Mandatory=$true)][string] $SearchServiceAppName,      
 [Parameter(Mandatory=$true)][string] $DatabasePrefix,
 [Parameter(Mandatory=$true)][string] $DatabaseServerName      
-)     
+)
+Start-Transcript
 Add-PSSnapin Microsoft.SharePoint.Powershell -ea 0      
 ## Validate if the supplied account exists in Active Directory and whether supplied as domain\username     
     if ($SearchServiceAccount.Contains("\")) # if True then domain\username was used      
@@ -116,3 +117,4 @@ Write-Output " Cloud hybrid search service application provisioning completed su
  
     Break 
 } # End Else   
+Stop-Transcript

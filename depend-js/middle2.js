@@ -1,0 +1,1 @@
+var middle2 = 'middle2';

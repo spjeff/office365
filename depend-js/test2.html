@@ -1,0 +1,16 @@
+<script src="/SiteAssets/depend.js"></script>
+<script type="text/javascript">
+    depend('http://portal/SiteAssets/jquery-3.1.1.min.js', function () {
+        depend('http://portal/SiteAssets/middle2.js', null)
+    });
+
+    function test2init() {
+        console.log('ready-test2');
+        console.log(jQuery);
+        console.log(middle2);
+
+        // change site icon
+        $('img#ctl00_onetidHeadbnnr2').attr('src', '/_layouts/15/images/wpicon.gif');
+    }
+    _spBodyOnLoadFunctionNames.push('test2init');
+</script>

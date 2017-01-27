@@ -1,0 +1,16 @@
+<script src="/SiteAssets/depend.js"></script>
+<script type="text/javascript">
+    depend('http://portal/SiteAssets/jquery-3.1.1.min.js', function () {
+        depend('http://portal/SiteAssets/middle.js', null)
+    });
+
+    function testInit() {
+        console.log('ready-test');
+        console.log(jQuery);
+        console.log(middle);
+
+        // hide page title
+        $('span#DeltaPlaceHolderPageTitleInTitleArea').hide();
+    }
+    _spBodyOnLoadFunctionNames.push('testInit');
+</script>

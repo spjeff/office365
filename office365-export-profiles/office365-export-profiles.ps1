@@ -25,29 +25,29 @@ $coll = @()
 $csv = ""
 Connect-SPOnline -Url $tenantUrl -Credentials $cred
 foreach ($u in $allUsers) {
-	# Progress Tracking
-	$i++
-	$prct = [Math]::Round((($i / $total) * 100.0), 2)
-	$elapsed = (Get-Date) - $start
-	$remain = ($elapsed.TotalSeconds) / ($prct / 100.0)
-	$eta = (Get-Date).AddSeconds($remain)
+    # Progress Tracking
+    $i++
+    $prct = [Math]::Round((($i / $total) * 100.0), 2)
+    $elapsed = (Get-Date) - $start
+    $remain = ($elapsed.TotalSeconds) / ($prct / 100.0)
+    $eta = (Get-Date).AddSeconds($remain)
 	
-	# Display
-	Write-Progress -Activity "Download SharePoint Online user profiles - ETA $eta" -Status "$prct" -PercentComplete $prct
+    # Display
+    Write-Progress -Activity "Download SharePoint Online user profiles - ETA $eta" -Status "$prct" -PercentComplete $prct
 	
-	# Append CSV sign in name
-	$csv += $u.SignInName + ","
-	if ($i -eq 200) {
-		# Download
-		$csv = $csv.TrimEnd(",")
-		$obj = Get-SPOUserProfileProperty -Account $csv.Split(",") -ErrorAction SilentlyContinue
-		$coll += $obj
+    # Append CSV sign in name
+    $csv += $u.SignInName + ","
+    if ($i -eq 200) {
+        # Download
+        $csv = $csv.TrimEnd(",")
+        $obj = Get-SPOUserProfileProperty -Account $csv.Split(",") -ErrorAction SilentlyContinue
+        $coll += $obj
 		
-		# clear
-		$csv = ""
-		$i = 0
-		Write-Host "." -NoNewLine
-	}
-	$i++
+        # clear
+        $csv = ""
+        $i = 0
+        Write-Host "." -NoNewLine
+    }
+    $i++
 }
 $coll | Export-Csv "sharepoint-profiles.csv"

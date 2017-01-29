@@ -30,8 +30,7 @@ Add-Type -AssemblyName ("Microsoft.SharePoint.Client, Version=$SP_VERSION.0.0.0,
 Add-Type -AssemblyName ("Microsoft.SharePoint.Client.Search, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c")
 Add-Type -AssemblyName ("Microsoft.SharePoint.Client.Runtime, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c")
 
-if ($Credential -eq $null)
-{
+if ($Credential -eq $null) {
     $Credential = Get-Credential -Message "SharePoint Online tenant admin credential"
 }
 

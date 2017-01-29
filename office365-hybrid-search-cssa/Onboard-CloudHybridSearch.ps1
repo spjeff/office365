@@ -54,8 +54,7 @@ if ($regKey -eq $null) {
 
 Write-Host "Configuring for SharePoint Server version $SP_VERSION."
 
-function Configure-LocalSharePointFarm
-{
+function Configure-LocalSharePointFarm {
     Param(
         [Parameter(Mandatory=$true)][string] $Realm
     )
@@ -139,8 +138,7 @@ function Configure-LocalSharePointFarm
     return (Get-SPSecurityTokenServiceConfig).LocalLoginProvider.SigningCertificate
 }
 
-function Upload-SigningCredentialToSharePointPrincipal
-{
+function Upload-SigningCredentialToSharePointPrincipal {
     Param(
         [Parameter(Mandatory=$true)][System.Security.Cryptography.X509Certificates.X509Certificate2] $Cert
     )
@@ -157,8 +155,7 @@ function Upload-SigningCredentialToSharePointPrincipal
     }
 }
 
-function Add-ScsServicePrincipal
-{
+function Add-ScsServicePrincipal {
     $spns = $SCS_AUTHORITIES | foreach { "$SCS_APPPRINCIPALID/$_" }
     $principal = Get-MsolServicePrincipal -AppPrincipalId $SCS_APPPRINCIPALID -ErrorAction SilentlyContinue
 
@@ -183,8 +180,7 @@ function Add-ScsServicePrincipal
     }
 }
 
-function Prepare-Environment
-{
+function Prepare-Environment {
     $MSOIdCRLRegKey = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\MSOIdentityCRL" -ErrorAction SilentlyContinue
     if ($MSOIdCRLRegKey -eq $null) {
         Write-Host "Online Services Sign-In Assistant required, install from http://www.microsoft.com/en-us/download/details.aspx?id=39267." -Foreground Red
@@ -229,8 +225,7 @@ function Prepare-Environment
     }
 }
 
-function Get-CloudSsa
-{
+function Get-CloudSsa {
     $ssa = $null
 
     if (-not $CloudSsaId) {
@@ -298,11 +293,11 @@ static public class ClientContextHelper
 "@
 
 $assemblies = @(
-"System.Core.dll",
-"System.Web.dll",
-"Microsoft.SharePoint, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-"Microsoft.SharePoint.Client, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-"Microsoft.SharePoint.Client.Runtime, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+    "System.Core.dll",
+    "System.Web.dll",
+    "Microsoft.SharePoint, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+    "Microsoft.SharePoint.Client, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+    "Microsoft.SharePoint.Client.Runtime, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
 )
 
 Add-Type -AssemblyName ("Microsoft.SharePoint.Client, Version=$SP_VERSION.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c")
@@ -312,8 +307,7 @@ Add-Type -TypeDefinition $code -ReferencedAssemblies $assemblies
 
 Add-PSSnapin Microsoft.SharePoint.PowerShell
 
-try
-{
+try {
     Write-Host "Accessing Cloud SSA..." -Foreground Yellow
     $ssa = Get-CloudSsa
 
@@ -344,11 +338,11 @@ try
 
     Write-Host "Connecting to content farm in SPO..." -foreground Yellow
     $cctx = [ClientContextHelper]::GetAppClientContext($PortalUrl)
-	Write-Host "Context:"
-	$cctx 
+    Write-Host "Context:"
+    $cctx 
     $pushTenantManager = new-object Microsoft.SharePoint.Client.Search.ContentPush.PushTenantManager $cctx
-	Write-Host "PushTenantManager:"
-	$pushTenantManager 
+    Write-Host "PushTenantManager:"
+    $pushTenantManager 
 	
     # Retry up to 4 minutes, mitigate 401 Unauthorized from CSOM
     Write-Host "Preparing tenant for cloud hybrid search (this can take a couple of minutes)..." -foreground Yellow
@@ -407,8 +401,7 @@ try
 
     Write-Host "All done!" -foreground Green
 }
-catch
-{
+catch {
     Write-Error -ErrorRecord $_
     Write-Host "It is safe to re-run onboarding if you believe this error is transient." -Foreground Yellow
     return

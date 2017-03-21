@@ -1,10 +1,10 @@
-/* Office365 - Group Policy
+/* Office365 - Group Policy Object (GPO) - apply standard configuration to cloud GUI
 
  - hide Site Setting links
  - hide Site Features
  - hide Web Features
  
-   last updated 08-22-16
+   last updated 03-21-17
 */
 
 (function() {
@@ -137,10 +137,10 @@
         });
 
         // Change Owner link
-        // find group
         var match;
         var section = document.querySelectorAll('h3.ms-linksection-title');
         if (section) {
+            // find group
             for (var i = 0; i < section.length; i++) {
                 var el = section[i];
                 if (el.innerHTML.indexOf("Users and Permissions") > 0) {
@@ -190,7 +190,6 @@
             }
         }
     }
-
 
     //initialize
     ready(main);

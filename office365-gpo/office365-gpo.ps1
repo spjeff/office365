@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$false, Position=0, ValueFromPipeline=$false, HelpMessage='Optional URL to configure one site only')]
+    [Parameter(Mandatory = $false, Position = 0, ValueFromPipeline = $false, HelpMessage = 'Optional URL to configure one site only')]
     [Alias("url")]
     [string]$matchURL
 )
@@ -10,8 +10,8 @@ Office365 - Group Policy
  * leverages 3 libraries (SPO, PNP, CSOM)
  * leverages parallel PowerShell
  * grant Site Collection Admin for support staff
- * apply Site Collection quota 2GB
- * enable Site Collection auditing
+ * apply Site Collection quota 5GB  (if none)
+ * enable Site Collection Auditing
  * enable Site Collection Custom Action JS ("office365-gpo.js")
 #>
 
@@ -20,8 +20,8 @@ workflow GPOWorkflow {
     param ($sites, $UserName, $Password)
 
     Function VerifySite([string]$SiteUrl, $UserName, $Password) {
-        Function Get-SPOCredentials([string]$UserName,[string]$Password) {
-            if([string]::IsNullOrEmpty($Password)) {
+        Function Get-SPOCredentials([string]$UserName, [string]$Password) {
+            if ([string]::IsNullOrEmpty($Password)) {
                 $SecurePassword = Read-Host -Prompt "Enter the password" -AsSecureString 
             }
             else {
@@ -29,7 +29,7 @@ workflow GPOWorkflow {
             }
             return New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($UserName, $SecurePassword)
         }
-        Function Get-ActionBySequence([Microsoft.SharePoint.Client.ClientContext]$context,[int]$Sequence) {
+        Function Get-ActionBySequence([Microsoft.SharePoint.Client.ClientContext]$context, [int]$Sequence) {
             $customActions = $context.Site.UserCustomActions
             $context.Load($customActions)
             $context.ExecuteQuery()
@@ -41,16 +41,16 @@ workflow GPOWorkflow {
             $context.ExecuteQuery()
             "DELETED"
         }
-        Function Verify-ScriptLinkAction([Microsoft.SharePoint.Client.ClientContext]$context,[string]$ScriptSrc,[string]$ScriptBlock, [int]$Sequence) {
+        Function Verify-ScriptLinkAction([Microsoft.SharePoint.Client.ClientContext]$context, [string]$ScriptSrc, [string]$ScriptBlock, [int]$Sequence) {
             $actions = Get-ActionBySequence -Context $context -Sequence $Sequence
 			
             if (!$actions) {
                 $action = $context.Site.UserCustomActions.Add();
                 $action.Location = "ScriptLink"
-                if($ScriptSrc) {
+                if ($ScriptSrc) {
                     $action.ScriptSrc = $ScriptSrc
                 }
-                if($ScriptBlock) {
+                if ($ScriptBlock) {
                     $action.ScriptBlock = $ScriptBlock
                 }
                 $action.Sequence = $Sequence
@@ -118,7 +118,8 @@ workflow GPOWorkflow {
                         $feat.Add($id, $true, [Microsoft.SharePoint.Client.FeatureDefinitionScope]::Farm)
                         $context.ExecuteQuery()
                     }
-                } else {
+                }
+                else {
                     Write-Host "REMOVE FEAT" -Fore Yellow
                     if ($found) {
                         $feat.Remove($id, $true)
@@ -196,7 +197,8 @@ workflow GPOWorkflow {
             Verify-Features -Context $context
 
             $context.Dispose()
-        } catch {
+        }
+        catch {
             Write-Error "ERROR -- $SiteUrl -- $($_.Exception.Message)"
         }
     }
@@ -234,7 +236,8 @@ Function Main {
     Write-Host "Opening list of sites ... $matchURL" -Fore Green
     if ($matchURL) {
         $sites = Get-MSPOSite -Filter "url -like ""$matchURL"""
-    } else {
+    }
+    else {
         $sites = Get-MSPOSite
     }
     $sites.Count
@@ -246,7 +249,7 @@ Function Main {
         #SPO
         #Storage quota
         if (!$s.StorageQuota) {
-            Set-MSPOSite -Identity $s.Url -StorageQuota 2000 -StorageQuotaWarningLevel 1900
+            Set-MSPOSite -Identity $s.Url -StorageQuota 5000 -StorageQuotaWarningLevel 4000
             Write-Output "set 2GB quota on $($s.Url)"
         }
 
@@ -257,7 +260,8 @@ Function Main {
             if (!$user.IsSiteAdmin) {
                 Set-MSPOUser -Site $s.Url -Loginname $scaUser -IsSiteCollectionAdmin $true -ErrorAction SilentlyContinue | Out-Null
             }
-        } catch {
+        }
+        catch {
         }
 
         #PNP

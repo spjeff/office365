@@ -8,8 +8,8 @@
 .NOTES
 	File Name		: office365-desktop-icon.ps1
 	Author			: Jeff Jones - @spjeff
-	Version			: 0.11
-	Last Modified	: 07-25-2016
+	Version			: 0.12
+	Last Modified	: 03-30-2017
 .LINK
 	Source Code
 		http://www.github.com/spjeff/o365/office365-desktop-icon.ps1
@@ -35,7 +35,7 @@ $tenant = $split[$split.length - 1]
 $hash = $pw | ConvertFrom-SecureString
 
 # command
-"Write-Host ""   ____   __  __ _            ____    __ _____ "" -Fore Yellow`nWrite-Host ""  / __ \ / _|/ _(_)          |___ \  / /| ____|"" -Fore Yellow`nWrite-Host "" | |  | | |_| |_ _  ___ ___    __) |/ /_| |__  "" -Fore Yellow`nWrite-Host "" | |  | |  _|  _| |/ __/ _ \  |__ <| '_ \___ \ "" -Fore Yellow`nWrite-Host "" | |__| | | | | | | (_|  __/  ___) | (_) |__) |"" -Fore Yellow`nWrite-Host ""  \____/|_| |_| |_|\___\___| |____/ \___/____/ "" -Fore Yellow`nWrite-Host ""                                               "" -Fore Yellow`nWrite-Host ""Connecting ..."" -NoNewLine`n`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`n`$pnp = Get-Module -ListAvailable SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue`nif (`$pnp) {`n	Import-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -Prefix P -ErrorAction SilentlyContinue`n`$pre=""M""`n}`nImport-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell -Prefix `$pre -ErrorAction SilentlyContinue`nConnect-MSPOService -URL $url -Credential `$c`n`$firstUrl = (Get-MSPOSite)[0].Url`n`$pnpurl = ""https://github.com/OfficeDev/PnP-PowerShell""`nif (`$pnp) {`n	Connect-PSPOnline -URL `$firstUrl -Credential `$c`n} else {`n	Write-Warning ""Missing PNP cmds. Download at $pnpurl""`n	start $pnpurl`n}`nWrite-Host ""[OK]"" -Fore Green`n""SPO commands: `$((get-command *-mspo*).count)""`n""PNP commands: `$((get-command *-pspo*).count)""`nGet-MSPOSite`n`$site=Get-MSPOSite`n""`nSite Count: `$(`$site.count)""" | Out-File "$home\o365-icon-$tenant.ps1"
+"Write-Host ""   ____   __  __ _            ____    __ _____ "" -Fore Yellow`nWrite-Host ""  / __ \ / _|/ _(_)          |___ \  / /| ____|"" -Fore Yellow`nWrite-Host "" | |  | | |_| |_ _  ___ ___    __) |/ /_| |__  "" -Fore Yellow`nWrite-Host "" | |  | |  _|  _| |/ __/ _ \  |__ <| '_ \___ \ "" -Fore Yellow`nWrite-Host "" | |__| | | | | | | (_|  __/  ___) | (_) |__) |"" -Fore Yellow`nWrite-Host ""  \____/|_| |_| |_|\___\___| |____/ \___/____/ "" -Fore Yellow`nWrite-Host ""                                               "" -Fore Yellow`nWrite-Host ""Connecting ..."" -NoNewLine`n`$h = ""$hash""`n`$secpw = ConvertTo-SecureString -String `$h`n`$c = New-Object System.Management.Automation.PSCredential (""$user"", `$secpw)`n`$pnp = Get-Module -ListAvailable SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue`nImport-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue`n`$pnpurl = ""https://github.com/OfficeDev/PnP-PowerShell""`nif (`$pnp) {`n	Connect-PnPOnline -URL ""$url"" -Credential `$c`n} else {`n	Write-Warning ""Missing PNP cmds. Download at `$pnpurl""`n	start `$pnpurl`n}`nWrite-Host ""[OK]"" -Fore Green`n""PNP commands: `$((get-command *-pnp*).count)""`n`$site=Get-PnpTenantSite`n`$site`n""`nSite Count: `$(`$site.count)""" | Out-File "$home\o365-icon-$tenant.ps1"
 
 # create desktop shortcut
 $folder = [Environment]::GetFolderPath("Desktop")

@@ -13,8 +13,8 @@ Write-Host "Azure AD (AAD)"
 $secPassword = ConvertTo-SecureString $password -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential ($userName, $secPassword)
 Connect-MsolService -Credential $cred
-$allUsers = Get-MsolUser -All
-$allUsers | Export-Csv "azure-ad-profiles.csv"
+$msolUsers = Get-MsolUser -All
+$msolUsers | Export-Csv "azure-ad-profiles.csv"
 
 # SharePoint Online (SPO) - All Profiles
 Write-Host "SharePoint Online (SPO)"
@@ -24,7 +24,9 @@ $total = $allUsers.Count
 $coll = @()
 $csv = ""
 Connect-SPOnline -Url $tenantUrl -Credentials $cred
-foreach ($u in $allUsers) {
+Connect-SPOService -Url $tenantUrl -Credential $cred
+$spoUsers = Get-SPOUser -Site $tenantUrl
+foreach ($u in $spoUsers) {
     # Progress Tracking
     $i++
     $prct = [Math]::Round((($i / $total) * 100.0), 2)
@@ -36,7 +38,7 @@ foreach ($u in $allUsers) {
     Write-Progress -Activity "Download SharePoint Online user profiles - ETA $eta" -Status "$prct" -PercentComplete $prct
 	
     # Append CSV sign in name
-    $csv += $u.SignInName + ","
+    $csv += $u.LoginName + ","
     if ($i -eq 200) {
         # Download
         $csv = $csv.TrimEnd(",")

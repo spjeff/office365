@@ -1,9 +1,0 @@
-<settings>
-    <tenant>tenant</tenant>
-	<adminUserName>admin@tenant.onmicrosoft.com</adminUserName>
-	<adminPass>pass@word1</adminPass>
-    <adminUsers>admin@tenant.onmicrosoft.com, c:0-.f|rolemanager|s-1-5-21-1234567890-123456789-123456789-1234567</adminUsers>
-	<scriptName>office365-gpo.js</scriptName>
-	<scriptURL>https://tenant.sharepoint.com/SiteAssets/office365-gpo/office365-gpo.js</scriptURL>
-	<workers>4</workers>
-</settings>

@@ -20,8 +20,8 @@
 # Set date, age limit, & path for reports
 $Date = Get-Date -Format MM-dd-yyyy-HHmm 
 $ReportAgeLimit = -45
-$ReportPath = "D:\Production_Processes\EnableUsersReports"
-$TranscriptPath = "D:\Production_Processes\ScriptLogs\ScriptLog" + $Date + ".log"
+$ReportPath = "D:\EnableUsersReports"
+$TranscriptPath = "D:\ScriptLogs\ScriptLog" + $Date + ".log"
 $Script:ScriptDC1 = "DC1.company.com"
 $Script:ScriptDC2 = "DC2.company.com"
 
@@ -52,10 +52,10 @@ $Script:ActiveUnitsCheck = 1000
 ####################
 
 $VisioGroups = @()
-$VisioGroups += "SG-FM-ICOM-MSFT-VISIO-365-C2R-X86"
+$VisioGroups += "MSFT-VISIO-365-C2R-X86"
 
 $ProjectGroups = @()
-$ProjectGroups += "SG-FM-ICOM-MSFT-PROJECT-365-C2R-X86"
+$ProjectGroups += "MSFT-PROJECT-365-C2R-X86"
 
 #############################
 # Services to add Variables #
@@ -71,8 +71,8 @@ $ProjectServicesToAdd = "PROJECT_CLIENT_SUBSCRIPTION"
 ###################
 
 # Get Credentials
-$username = "srvlicx@fmacpt.onmicrosoft.com"
-$password = Get-Content "D:\Production_Processes\GlobalAdminPassword-Encrypted.txt" | ConvertTo-SecureString
+$username = "srvlic@tenant.onmicrosoft.com"
+$password = Get-Content "D:\Encrypted.txt" | ConvertTo-SecureString
 $cred = New-Object -TypeName System.Management.Automation.PSCredential -argumentlist $username, $password
 
 # Import modules needed to run script

@@ -35,6 +35,7 @@ function MigrationBanner() {
 		console.log('MigrationBanner - found and modify');
 		//found and modify
 		var h = sp.innerHTML;
+		h = h.replace("This site is read only at the farm administrator's request.", '<table border=0><tr><td><img src="/_layouts/images/kpinormallarge-1.gif" height="15px" width="15px" style="padding-right:20px"/></td><td><b>MIGRATION IN PROGRESS:</b> This site is being moved to Office 365 and will be locked as Read-Only until its migration is complete.<br/>Please check in soon to be automatically redirected to this site’s new location in the cloud. <a href="https://kbarticle">Learn more...</a></td></tr><table>');
 		sp.innerHTML = h;
 		addcss('#status_preview_body {display:inherit}');
 	}

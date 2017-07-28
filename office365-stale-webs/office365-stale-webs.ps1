@@ -88,7 +88,7 @@ Function processWeb($web) {
     $stale = $false
     $lists = Get-PnPList -Web $web -Includes "LastModified" | % {New-Object PSObject -Property @{LastModified = $_.LastModified; }}
     $mostRecentList = ($lists | sort LastModified -Desc)[0]
-    $age = (Get-Date) - $mostRecentList
+    $age = (Get-Date) - $mostRecentList.LastModified
     if ($age.Days -gt $global:ThresholdDays) {
         $stale = $true
     }
@@ -103,7 +103,17 @@ Function processWeb($web) {
             Set-SPOPropertyBag -Key "StaleWebs_WarningCount" -Value 1
             Set-SPOPropertyBag -Key "StaleWebs_EmailSentTime" -Value (Get-Date)
 
-            #TODO - Add row to table
+            # Add row to table
+            $newRow = $global:dtWebs.NewRow()
+            $newRow["URL"] = $url
+            $newRow["Title"] = $web.Tile
+            $newRow["Last Modified Time Web"] = $mostRecentList.LastModified
+            $newRow["Owner"] = $web.RequestAccessEmail
+            $newRow["IsRootWeb"] = $web.IsRootWeb
+            $newRow["StaleWebs_WarningCount"] = $StaleWebs_WarningCount 
+            $newRow["StaleWebs_EmailSentTime"] = $StaleWebs_EmailSentTime
+            $newRow["Deleted"] = 0
+            $global:dtWebs.Rows.Add($newRow)
             
             # Email notify site owner
             emailReminder $true, $web.Title, $url
@@ -113,7 +123,17 @@ Function processWeb($web) {
             Write-Host "Deleting web $url"
             Remove-PnPWeb $url -Force
             
-            #TODO - Add row to table
+            # Add row to table
+            $newRow = $global:dtWebs.NewRow()
+            $newRow["URL"] = $url
+            $newRow["Title"] = $web.Tile
+            $newRow["Last Modified Time Web"] = $mostRecentList.LastModified
+            $newRow["Owner"] = $web.RequestAccessEmail
+            $newRow["IsRootWeb"] = $web.IsRootWeb
+            $newRow["StaleWebs_WarningCount"] = $StaleWebs_WarningCount 
+            $newRow["StaleWebs_EmailSentTime"] = $StaleWebs_EmailSentTime
+            $newRow["Deleted"] = 1
+            $global:dtWebs.Rows.Add($newRow)
 
             # Email notify site owner
             emailReminder $true, $web.Title, $url
@@ -123,10 +143,21 @@ Function processWeb($web) {
             $timeSinceLastReminder = (Get-Date) - $StaleWebs_EmailSentTime
             if ($timeSinceLastReminder.Hours -gt $ReminderDays) {
                 $StaleWebs_WarningCount++
+                $StaleWebs_EmailSentTime = Get-Date
                 Set-SPOPropertyBag -Key "StaleWebs_WarningCount" -Value $StaleWebs_WarningCount 
-                Set-SPOPropertyBag -Key "StaleWebs_EmailSentTime" -Value (Get-Date)
+                Set-SPOPropertyBag -Key "StaleWebs_EmailSentTime" -Value $StaleWebs_EmailSentTime
 
-                #TODO - Add row to table
+                # Add row to table
+                $newRow = $global:dtWebs.NewRow()
+                $newRow["URL"] = $url
+                $newRow["Title"] = $web.Tile
+                $newRow["Last Modified Time Web"] = $mostRecentList.LastModified
+                $newRow["Owner"] = $web.RequestAccessEmail
+                $newRow["IsRootWeb"] = $web.IsRootWeb
+                $newRow["StaleWebs_WarningCount"] = $StaleWebs_WarningCount 
+                $newRow["StaleWebs_EmailSentTime"] = $StaleWebs_EmailSentTime
+                $newRow["Deleted"] = 0
+                $global:dtWebs.Rows.Add($newRow)
 
                 # Email notify site owner
                 emailReminder $true, $web.Title, $url

@@ -11,7 +11,7 @@
 $AdminUrl = "https://tenant-admin.sharepoint.com"
 $UserName = "admin@tenant.onmicrosoft.com"
 $Password = "pass@word1"
-$ThresholdDays = 180
+$ThresholdDays = 30
 $ReminderDays = 6
 $MaxReminders = 4
 $EmailFrom = "sharepoint_support@tenant.com"
@@ -73,11 +73,11 @@ Function emailSummary() {
 
 Function emailCloud($to, $subject, $body) {
     # Get the PowerShell credential and prints its properties 
-    $MyCredential = "O365SMTP"
-    $cred = Get-AutomationPSCredential -Name $MyCredential 
+    # $MyCredential = "O365SMTP"
+    # $cred = Get-AutomationPSCredential -Name $MyCredential 
     if ($cred -eq $null) {return}
 
-    Send-MailMessage -To $to -Subject $subject -Body $body -UseSsl -Port 587 -SmtpServer 'smtp.office365.com' -From $EmailFrom -BodyAsHtml -Credential $cred 
+    Send-MailMessage -To $to -Subject $subject -Body $body -UseSsl -Port 587 -SmtpServer 'smtp.office365.com' -From $EmailFrom -BodyAsHtml -Credential $global:cred
 }
 
 Function processWeb($web) {
@@ -86,9 +86,9 @@ Function processWeb($web) {
     # Current site - Is stale?
     $url = $web.Url
     $stale = $false
-    $lists = Get-PnPList -Web $web -Includes "LastModified" | % {New-Object PSObject -Property @{LastModified = $_.LastModified; }}
+    $lists = Get-PnPList -Web $web -Includes "LastItemModifiedDate" | % {New-Object PSObject -Property @{LastModified = $_.LastModified; }}
     $mostRecentList = ($lists | sort LastModified -Desc)[0]
-    $age = (Get-Date) - $mostRecentList.LastModified
+    $age = (Get-Date) - ([datetime]$mostRecentList.LastModified)
     if ($age.Days -gt $global:ThresholdDays) {
         $stale = $true
     }
@@ -96,6 +96,10 @@ Function processWeb($web) {
     # Current property bag
     $StaleWebs_WarningCount = Get-SPOPropertyBag -Key "StaleWebs_WarningCount"
     $StaleWebs_EmailSentTime = Get-SPOPropertyBag -Key "StaleWebs_EmailSentTime"
+
+    # Email recipient
+    $to = $web.RequestAccessEmail
+    $to = $EmailFrom
     
     if ($stale) {
         if (!$StaleWebs_WarningCount) {
@@ -116,7 +120,7 @@ Function processWeb($web) {
             $global:dtWebs.Rows.Add($newRow)
             
             # Email notify site owner
-            emailReminder $true, $web.Title, $url
+            emailReminder $false, $web.Title, $url, $to
         }
         elseif ($StaleWebs_WarningCount -gt $MaxReminders) {
             # Delete
@@ -136,7 +140,7 @@ Function processWeb($web) {
             $global:dtWebs.Rows.Add($newRow)
 
             # Email notify site owner
-            emailReminder $true, $web.Title, $url
+            emailReminder $true, $web.Title, $url, $to
         }
         else {
             # Reminder
@@ -160,7 +164,7 @@ Function processWeb($web) {
                 $global:dtWebs.Rows.Add($newRow)
 
                 # Email notify site owner
-                emailReminder $true, $web.Title, $url
+                emailReminder $false, $web.Title, $url, $to
             }
         }
     }
@@ -180,10 +184,10 @@ Function Main {
 		
     # Credential
     $secpw = ConvertTo-SecureString -String $Password -AsPlainText -Force
-    $c = New-Object System.Management.Automation.PSCredential ($UserName, $secpw)
+    $global:cred = New-Object System.Management.Automation.PSCredential ($UserName, $secpw)
 
     # Connect Office 365
-    Connect-SPOService -URL $AdminUrl -Credential $c
+    Connect-SPOService -URL $AdminUrl -Credential $global:cred
 	
     # Scope
     Write-Host "Opening list of sites ..." -Fore Green
@@ -196,14 +200,14 @@ Function Main {
         Write-Host "." -NoNewLine
 
         # PNP
-        Connect-PnPOnline -Url $s.Url -Credentials $c
+        Connect-PnPOnline -Url $s.Url -Credentials $global:cred
         
         # Root
         $root = Get-PnPWeb
         processWeb $root
 
         # Child webs
-        $webs = Get-PnPSubWeb -Recurse
+        $webs = Get-PnPSubWebs -Recurse
         $webs | % {processWeb $_}
     }
 

@@ -38,7 +38,7 @@ Function defineMetrics() {
     $col = $global:dtWebs.Columns.Add("Script Run Date", [DateTime])
 }
 
-Function emailReminder($final, $title, $url, $to) {
+Function emailReminder($final, $title, $url, $to, $reminderNumber) {
     # Final notification
     if ($final) {
         $file = "Stale_Webs_Email_Site_Final.htm"
@@ -50,7 +50,7 @@ Function emailReminder($final, $title, $url, $to) {
     # Site Owner
     $html = Get-Content $file
     $subject = $html[0]
-    $body = ($html | Select -Skip 1 | Out-String) -f $title, $url
+    $body = ($html | Select -Skip 1 | Out-String) -f $title, $url, $reminderNumber
 
     # Send Email
     emailCloud $to, $subject, $body  
@@ -65,7 +65,7 @@ Function emailSummary() {
     $file = "Stale_Webs_Email_Summary.htm"
     $html = Get-Content $file
     $subject = $html[0]
-    $body = ($html | Select -Skip 1 | Out-String) -f $title, $url
+    $body = ($html | Select -Skip 1 | Out-String)
 
     # Send Email
     emailCloud $EmailSupport, $subject, $body
@@ -175,8 +175,8 @@ Function Main {
     defineMetrics
 
     # SPO and PNP modules
-    Import-Module -WarningAction SilentlyContinue Microsoft.Online.SharePoint.PowerShell
-    Import-Module -WarningAction SilentlyContinue SharePointPnPPowerShellOnline
+    Import-Module Microsoft.Online.SharePoint.PowerShell -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+    Import-Module SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
 		
     # Credential
     $secpw = ConvertTo-SecureString -String $Password -AsPlainText -Force

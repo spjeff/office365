@@ -22,6 +22,7 @@ Param(
     [PSCredential] $Credential
 )
 Start-Transcript
+(Get-Date)
 if ($ACS_APPPRINCIPALID -eq $null) {
     New-Variable -Option Constant -Name ACS_APPPRINCIPALID -Value '00000001-0000-0000-c000-000000000000'
     New-Variable -Option Constant -Name ACS_HOST -Value "accounts.accesscontrol.windows.net"

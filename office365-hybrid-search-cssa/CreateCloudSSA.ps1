@@ -8,6 +8,7 @@ Param(
     [Parameter(Mandatory=$true)][string] $DatabaseServerName      
 )
 Start-Transcript
+(Get-Date)
 Add-PSSnapin Microsoft.SharePoint.Powershell -ea 0      
 ## Validate if the supplied account exists in Active Directory and whether supplied as domain\username     
 if ($SearchServiceAccount.Contains("\")) {      

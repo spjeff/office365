@@ -62,14 +62,14 @@ function CreateRoleDefinitions($permName, $permDescription, $clone, $addPermissi
             $web.RoleDefinitions.Add($spRoleDef)
 
             $Context.ExecuteQuery()
-            Write-Host "Pemission level with the name $permName created" -Foregroundcolor black -Backgroundcolor Green
+            Write-Host "Permission level with the name $permName created" -Foregroundcolor black -Backgroundcolor Green
         }
         catch {
             Write-Host "There was an error creating Permission Level $permName : Error details $($_.Exception.Message)" -Foregroundcolor black -backgroundcolor Red
         }
     }
     else {
-        Write-Host "Pemission level with the name $permName already exists" -Foregroundcolor black -Backgroundcolor Red
+        Write-Host "Permission level with the name $permName already exists" -Foregroundcolor black -Backgroundcolor Red
     }
 }
  

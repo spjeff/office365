@@ -1,10 +1,11 @@
-/* Office365 - Group Policy Object (GPO) - apply standard configuration to cloud GUI
+/* Office365 - Group Policy
 
  - hide Site Setting links
  - hide Site Features
  - hide Web Features
+ - hide Custom Permission Levels
  
-   last updated 03-21-17
+   last updated 03-12-18
 */
 
 (function() {
@@ -15,7 +16,15 @@
                 clearInterval(checkExist);
                 fn();
             }
-        }, 100);
+        }, 250);
+    }
+
+    //Inject CSS
+    function injectCss(css) {
+        var style = document.createElement("style");
+        style.type = "text/css";
+        style.innerHTML = style;
+        document.body.appendChild(style);
     }
 
     //hide site feature
@@ -69,6 +78,7 @@
             'Search Config Data Site Columns',
             'Search Config List Instance Feature',
             'Search Config Template Feature',
+            'Site Feed',
             'SharePoint Server Publishing'
         ];
         features.forEach(function(feature, i) {
@@ -85,28 +95,21 @@
         var features = ['Content Type Syndication Hub',
             'Custom Site Collection Help',
             'Cross-Site Collection Publishing',
-
             'Duet End User Help Collection',
             'Duet Enterprise Reports Content Types',
-
             'In Place Records Management',
             'Library and Folder Based Retention',
             'Limited-access user permission lockdown mode',
-
             'Project Server Approval Content Type',
             'Project Web App Permission for Excel Web App Refresh',
             'Project Web App Ribbon',
             'Project Web App Settings',
-
             'Publishing Approval Workflow',
-
             'Reports and Data Search Support',
-
             'Sample Proposal',
             'Search Engine Sitemap',
             'SharePoint 2007 Workflows',
             'SharePoint Server Publishing Infrastructure',
-
             'Site Policy',
             'Workflows'
         ];
@@ -133,14 +136,16 @@
         ];
         links.forEach(function(id, i) {
             var el = document.getElementById(id);
-            el.style.display = 'none';
+            if (el) {
+                el.style.display = 'none';
+            }
         });
 
         // Change Owner link
+        // find group
         var match;
         var section = document.querySelectorAll('h3.ms-linksection-title');
         if (section) {
-            // find group
             for (var i = 0; i < section.length; i++) {
                 var el = section[i];
                 if (el.innerHTML.indexOf("Users and Permissions") > 0) {
@@ -155,6 +160,28 @@
             li.innerHTML = '<a title="Change site owner." href="setrqacc.aspx?type=web">Change Site Owner</a>';
             group.appendChild(li);
         }
+    }
+	
+	//toolbar - permission levels
+	function userSettings() {
+		var el = document.getElementById('Ribbon.Permission.Manage-LargeMedium-0-0');
+		if (el) {
+			el.style.display = 'none';
+		}
+	}
+	
+	//body - permission levels
+	function roleSettings() {
+		var el = document.getElementById('DeltaPlaceHolderMain');
+		if (el) {
+			el.innerHTML = '<h2>Disabled by SharePoint Support team.</h2>';
+		}
+    }
+    
+    //access request - checkboxes
+    function accessSettings() {
+        var css = '#ctl00_PlaceHolderMain_ctl00_chkMembersCanShare,label[for="ctl00_PlaceHolderMain_ctl00_chkMembersCanShare"],#ctl00_PlaceHolderMain_ctl00_chkMembersCanAddToGroup,label[for="ctl00_PlaceHolderMain_ctl00_chkMembersCanAddToGroup"] {display:none;}';
+        injectCss(css);
     }
 
     //wait until document ready http://youmightnotneedjquery.com/
@@ -188,8 +215,25 @@
             if (urlContains('settings.aspx')) {
                 waitDom('DeltaPlaceHolderMain', menuSettings);
             }
+			
+			//User
+            if (urlContains('user.aspx')) {
+                waitDom('Ribbon.Permission.Manage', userSettings);
+            }
+			
+			//Role
+            if (urlContains('role.aspx')) {
+                waitDom('DeltaPlaceHolderMain', roleSettings);
+            }
+
+            //Access Request
+            if (urlContains('setrqacc.aspx')) {
+                waitDom('DeltaPlaceHolderMain', accessSettings);
+            }
+            
         }
     }
+
 
     //initialize
     ready(main);

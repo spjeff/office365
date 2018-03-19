@@ -73,7 +73,11 @@ function CreateRoleDefinitions($permName, $permDescription, $clone, $addPermissi
     }
 }
  
-#calling role definition function
+# calling role definition function
 # CreateRoleDefinitions -permName "Test" -permDescription "Test - custom level" -addPermissionString "addListItems, editListItems, viewListItems"
+
 CreateRoleDefinitions -permName "NoDelete" -permDescription "Contribute - without Delete" -clone "Contribute" -removePermissionString "DeleteListItems"
 CreateRoleDefinitions -permName "AddOnly" -permDescription "Contribute - without Edit or Delete" -clone "Contribute" -removePermissionString "DeleteListItems,EditListItems"
+
+CreateRoleDefinitions -permName "NoEdit" -permDescription "Contribute - without Edit" -clone "Contribute" -removePermissionString "EditListItems"
+CreateRoleDefinitions -permName "EditOnly" -permDescription "Contribute - without Edit" -clone "Contribute" -removePermissionString "AddListItems,DeleteListItems"

@@ -73,8 +73,7 @@ function CreateRoleDefinitions($permName, $permDescription, $clone, $addPermissi
     }
 }
  
-# calling role definition function
-# CreateRoleDefinitions -permName "Test" -permDescription "Test - custom level" -addPermissionString "addListItems, editListItems, viewListItems"
+# Create 4 Custom Permission Levels.  Defined by removed permission strings.
 
 CreateRoleDefinitions -permName "NoDelete" -permDescription "Contribute - without Delete" -clone "Contribute" -removePermissionString "DeleteListItems"
 CreateRoleDefinitions -permName "AddOnly" -permDescription "Contribute - without Edit or Delete" -clone "Contribute" -removePermissionString "DeleteListItems,EditListItems"

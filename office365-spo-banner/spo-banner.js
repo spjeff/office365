@@ -40,6 +40,11 @@ function getCookie(cname) {
 
 // Display banner
 function spoBannerLoad() {
+  // Skip for modal dialogs
+  if (document.location.href.indexOf("IsDlg=1") > 0) {
+    return;
+  }
+
   // HTTP GET for banner SPList items
   var request = new XMLHttpRequest();
   request.open('GET', "/_api/web/lists/getbytitle('GlobalAlert')/items", true);

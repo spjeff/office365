@@ -19,7 +19,7 @@ function readCalendar($token) {
     $api = "https://graph.microsoft.com/v1.0/users"
     $users = $null
     $users = Invoke-RestMethod -Headers @{Authorization = "Bearer $($token.access_token)" } -Uri $api -Method "GET" -ContentType "application/json"
-    foreach ($u in $users) {
+    foreach ($u in $users.value) {
 
         # All events for user
         $upn = $u.value[0].userPrincipalName

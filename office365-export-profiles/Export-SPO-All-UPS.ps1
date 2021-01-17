@@ -1,6 +1,6 @@
 # from https://gist.github.com/asadrefai/ecfb32db81acaa80282d
 # from https://www.microsoft.com/en-us/download/confirmation.aspx?id=42038
-# installed file [sharepointclientcomponents_16-6906-1200_x64-en-us] 
+# installed file [sharepointclientcomponents_16-6906-1200_x64-en-us.msi] 
 Try{
     Add-Type -Path 'C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.dll'
     Add-Type -Path 'C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.Runtime.dll'

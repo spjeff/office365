@@ -6,7 +6,7 @@ Dim replyEmail As MailItem
 Dim firstName As String
 
 Set origEmail = ActiveExplorer.Selection(1)
-Set replyEmail = CreateItemFromTemplate("C:\BIN\JobApply.oft")
+Set replyEmail = CreateItemFromTemplate("C:\BIN\template.oft")
 firstName = Split(origEmail.Reply.To, " ")(0)
 
 replyEmail.To = origEmail.Reply.To & "<" & origEmail.SenderEmailAddress & ">"

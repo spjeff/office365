@@ -1,0 +1,34 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json",
+    "elmType": "a",
+    "attributes": {
+      "href": "='/Lists/Expense%20Report/DispForm.aspx?ID=' + [$ID]",
+      "target": "_blank"
+    },
+    "style": {
+      "border": "none",
+      "color": "white",
+      "background-color": "#00457E",
+      "cursor": "pointer"
+    },
+    "children": [
+      {
+        "elmType": "span",
+        "style": {
+          "padding-left": "10px",
+          "padding-right": "10px"
+        },
+        "color": "white",
+        "txtContent": "",
+        "attributes" : {"iconName":"PreviewLink"}
+      },
+      {
+        "elmType": "span",
+        "style": {
+          "padding-left": "10px"
+        },
+        "color": "white",
+        "txtContent": "VIEW FORM"
+      }
+    ]
+  }

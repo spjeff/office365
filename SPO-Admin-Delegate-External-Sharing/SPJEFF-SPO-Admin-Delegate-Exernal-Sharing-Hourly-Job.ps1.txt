@@ -1,0 +1,34 @@
+# Import module PnP.PowerShell
+Import-Module PnP.PowerShell
+
+# Configuration
+$Tenant                 = "spjeffdev.onmicrosoft.com"
+$TenantAdminURL         = "https://spjeffdev-admin.sharepoint.com"
+$ClientId               = "71ddd74f-0891-44e2-bb25-4c72197e8a08"
+$ClientPFX              = "SPJEFF-SPO-Admin-Delegate-Exernal-Sharing-Hourly-Job.pfx"
+$ApprovalListTitle      = "External Sharing"
+$ApprovalListSiteURL    = "https://spjeffdev.sharepoint.com/sites/RequestExternalSharing"
+
+# Connect PNP to source tracking list
+Connect-PnPOnline -Url $ApprovalListSiteURL -ClientId $ClientId -Tenant $Tenant -CertificatePath $ClientPFX
+
+# Read SharePoint list of site approved for External Sharing
+$Items = Get-PnPListItem -List $ApprovalListTitle -PageSize 1000
+
+# Loop all rows where Status=Approved
+foreach ($Item in $Items) {
+    if ($Item["Status"] -eq "Approved") {
+        # Process approved item
+        # Connect PNP to SharePoint Tenant Admin URL
+        Connect-PnPOnline -Url $TenantAdminURL -ClientId $ClientId -Tenant $Tenant -CertificatePath $ClientPFX
+
+        # Update setting for External Sharing to Enabled
+        Set-PnPTenantSite -Identity $Item["SiteURL"] -SharingCapability "ExternalUserSharingOnly"
+
+        # Connect PNP to source tracking list
+        Connect-PnPOnline -Url $ApprovalListSiteURL -ClientId $ClientId -Tenant $Tenant -CertificatePath $ClientPFX
+
+        # Update row to set Status=Complete
+        Set-PnPListItem -List $ApprovalListTitle -Identity $Item.Id -Values @{"Status" = "Complete"}
+    }
+}

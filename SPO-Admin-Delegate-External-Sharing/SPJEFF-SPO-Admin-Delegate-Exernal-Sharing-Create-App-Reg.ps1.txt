@@ -1,0 +1,9 @@
+# Import module PnP.PowerShell
+Import-Module PnP.PowerShell
+
+# Create new Azure app registration and generate PFX certificate
+$AppName    = "SPJEFF-SPO-Admin-Delegate-Exernal-Sharing-Hourly-Job"
+$Tenant     = "spjeffdev.onmicrosoft.com"
+
+$App = Register-PnPAzureADApp -ApplicationName $AppName -Tenant $Tenant
+$App | Format-List
